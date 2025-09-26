@@ -1,0 +1,91 @@
+/* src/components/Dashboard/dashboardStyles.css */
+body, html, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.czmu-dashboard-root {
+  display: flex;
+  height: calc(100vh - 80px); /* account for navbar */
+  gap: 12px;
+  background: linear-gradient(180deg, #04050a 0%, #07101a 100%);
+  color: #fff;
+  min-height: 0;
+}
+
+.czmu-left {
+  flex: 1;
+  background: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  min-height: 0;
+}
+
+.czmu-right {
+  width: 360px;
+  padding: 12px;
+  background: rgba(10, 12, 18, 0.9);
+  border-left: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.4);
+}
+
+.czmu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mode-switch button {
+  margin-left: 6px;
+  padding: 6px 10px;
+  background: #222;
+  color: #ddd;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.mode-switch button.active {
+  background: linear-gradient(90deg, #ffb86b, #ff6b6b);
+  color: #111;
+  font-weight: 700;
+}
+
+.controls {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.controls button {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: none;
+  background: #1b1f25;
+  color: #eee;
+  cursor: pointer;
+}
+
+.info-panel {
+  margin-top: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
+}
+
+.no-select {
+  padding: 12px;
+  color: #ccc;
+}
+
+.candidates-section {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  padding-top: 8px;
+}

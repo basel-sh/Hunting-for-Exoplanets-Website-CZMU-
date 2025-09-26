@@ -1,0 +1,58 @@
+.planet-game {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 500px;
+  margin: 40px auto;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.planet-game h2 {
+  color: #fff200;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.planet-game h3 {
+  color: #ff6f61;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.planet-img {
+  width: 150px;
+  height: 150px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 50%;
+  border: 3px solid #fff200;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.game-buttons button {
+  margin: 10px;
+  padding: 15px 25px;
+  background-color: #ffb347;
+  border: none;
+  border-radius: 15px;
+  color: #161b22;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.2rem;
+  transition: transform 0.2s, background-color 0.3s ease;
+}
+
+.game-buttons button:hover {
+  background-color: #ffcc70;
+  transform: scale(1.1);
+}
+
+.planet-game p {
+  font-size: 1.2rem;
+  margin-top: 15px;
+}
+
+

@@ -1,0 +1,93 @@
+.planets-list {
+  padding: 40px 20px;
+  background-color: #0d1117;
+  color: #fff;
+}
+
+.planets-list h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #58a6ff;
+}
+
+.planets-list ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 0;
+}
+
+.planets-list li {
+  background-color: #161b22;
+  padding: 20px;
+  border-radius: 15px;
+  width: 220px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.planets-list li:hover {
+  transform: translateY(-5px);
+}
+
+.see-more-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.see-more-container button {
+  background-color: #58a6ff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.see-more-container button:hover {
+  background-color: #1f6feb;
+}
+
+/* Modal */
+.planet-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #161b22;
+  padding: 30px;
+  border-radius: 15px;
+  width: 300px;
+  color: #fff;
+  text-align: center;
+}
+
+.modal-content button {
+  margin-top: 20px;
+  background-color: #58a6ff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.planets-list {
+  padding: 40px 20px;
+  padding-bottom: 100px; /* مسافة إضافية أسفل */
+  background-color: #0d1117;
+  color: #fff;
+}
