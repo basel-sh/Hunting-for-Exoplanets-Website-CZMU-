@@ -3,6 +3,7 @@ import ThreeScene from "./ThreeScene";
 import PlanetInfoPanel from "./PlanetInfoPanel";
 import ScientistOverview from "./ScientistOverview";
 import CandidatesList from "./CandidatesList";
+import { fetchKeplerCandidatesAPI, fetchTESSCandidatesAPI } from "./api";
 import "./dashboardStyles.css";
 
 export default function Dashboard({ initialPlanets = [] }) {
@@ -10,32 +11,33 @@ export default function Dashboard({ initialPlanets = [] }) {
   const [speed, setSpeed] = useState(1.0);
   const [paused, setPaused] = useState(false);
   const [planets, setPlanets] = useState(initialPlanets);
-
-  // Warning state with countdown
   const [warning, setWarning] = useState({ message: "", count: 0 });
 
+  // 🔹 Load a candidate into the scene
   const handleLoadCandidate = (candidate) => {
     if (planets.length >= 2) {
       setWarning({
         message:
           "⚠️ You can only render 2 samples at a time. Unload one to add another.",
-        count: 3, // countdown in seconds
+        count: 3,
       });
       return;
     }
-    setPlanets((prev) => {
-      if (prev.some((p) => p.kepoi_name === candidate.kepoi_name)) return prev;
-      return [...prev, candidate];
-    });
+    setPlanets((prev) =>
+      prev.some((p) => p.kepoi_name === candidate.kepoi_name)
+        ? prev
+        : [...prev, candidate]
+    );
   };
 
+  // 🔹 Unload a candidate from the scene
   const handleUnloadCandidate = (candidate) => {
     setPlanets((prev) =>
       prev.filter((p) => p.kepoi_name !== candidate.kepoi_name)
     );
   };
 
-  // Countdown effect
+  // 🔹 Countdown for warnings
   useEffect(() => {
     if (warning.count <= 0) return;
     const timer = setInterval(() => {
@@ -57,7 +59,6 @@ export default function Dashboard({ initialPlanets = [] }) {
           onSelectPlanet={() => {}}
         />
 
-        {/* Warning with countdown and close button */}
         {warning.count > 0 && (
           <div className="czmu-warning">
             <span>{warning.message}</span>
@@ -114,15 +115,19 @@ export default function Dashboard({ initialPlanets = [] }) {
           )}
         </div>
 
-        {mode === "scientist" && (
-          <div className="scientist-graphs">
-            <ScientistOverview planets={planets} />
-          </div>
-        )}
+        {mode === "scientist" && <ScientistOverview planets={planets} />}
 
         <div className="candidates-section">
-          <h4>Candidates (CSV)</h4>
           <CandidatesList
+            listTitle="Kepler Candidates"
+            fetchCandidates={fetchKeplerCandidatesAPI}
+            loadedPlanets={planets}
+            onLoadCandidate={handleLoadCandidate}
+            onUnloadCandidate={handleUnloadCandidate}
+          />
+          <CandidatesList
+            listTitle="TESS Candidates"
+            fetchCandidates={fetchTESSCandidatesAPI}
             loadedPlanets={planets}
             onLoadCandidate={handleLoadCandidate}
             onUnloadCandidate={handleUnloadCandidate}

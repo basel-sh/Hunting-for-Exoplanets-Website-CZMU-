@@ -1,133 +1,143 @@
-// src/components/Dashboard/CandidatesList.jsx
-import React, { useEffect, useState } from "react";
-import Papa from "papaparse";
-import { predictPlanetAPI } from "./api";
+import React, { useEffect, useState, useRef } from "react";
 
 export default function CandidatesList({
+  listTitle = "Candidates",
+  fetchCandidates,
   loadedPlanets,
   onLoadCandidate,
   onUnloadCandidate,
 }) {
   const [rows, setRows] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const listRef = useRef(null);
+  const LIMIT = 10;
 
-  useEffect(() => {
+  // 🔹 Load data with current offset
+  const loadData = async () => {
+    if (loading) return;
     setLoading(true);
-    fetch("/kepler_koi.csv")
-      .then((r) => r.text())
-      .then((text) => {
-        Papa.parse(text, {
-          header: true,
-          dynamicTyping: true,
-          skipEmptyLines: true,
-          complete: (results) => {
-            const candidates = results.data.filter(
-              (row) =>
-                (row.koi_disposition === "CANDIDATE" ||
-                  row.koi_pdisposition === "CANDIDATE") &&
-                row.kepoi_name
-            );
-            setRows(candidates);
-            setFiltered(candidates);
-            setLoading(false);
-          },
-        });
-      })
-      .catch((err) => {
-        console.error("CSV load error:", err);
-        setLoading(false);
-        setRows([]);
-        setFiltered([]);
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!query) {
-      setFiltered(rows);
-    } else {
-      const q = query.toLowerCase();
-      setFiltered(
-        rows.filter(
-          (r) =>
-            (r.kepoi_name && r.kepoi_name.toLowerCase().includes(q)) ||
-            (r.kepid && String(r.kepid).includes(q))
-        )
-      );
+    try {
+      const data = await fetchCandidates(offset, LIMIT);
+      if (data.length > 0) {
+        setRows((prev) => [...prev, ...data]);
+        setOffset((prev) => prev + LIMIT); // increment offset only after successful fetch
+      }
+    } catch (err) {
+      console.error("CandidatesList loadData error:", err);
     }
-  }, [query, rows]);
-
-  const handlePredict = async (row) => {
-    const res = await predictPlanetAPI(row);
-    alert(
-      `Prediction: ${res?.label ?? "error"} (prob ${res?.probability ?? "-"})`
-    );
+    setLoading(false);
   };
 
-  return (
-    <div style={{ padding: 8 }}>
-      <div style={{ marginBottom: 8 }}>
-        <input
-          style={{ width: "100%", padding: "6px" }}
-          placeholder="Search candidates by name or kepid..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </div>
+  // 🔹 Initial load
+  useEffect(() => {
+    setRows([]);
+    setOffset(0);
+    loadData();
+    // eslint-disable-next-line
+  }, [fetchCandidates]);
 
-      {loading ? (
-        <div>Loading candidates...</div>
-      ) : (
-        <div
-          style={{
-            maxHeight: 220,
-            overflowY: "auto",
-            borderTop: "1px solid #222",
-          }}
-        >
-          {filtered.length === 0 && (
-            <div style={{ padding: 8 }}>No results</div>
-          )}
-          {filtered.map((r, i) => {
-            const isLoaded = loadedPlanets.some(
-              (p) => p.kepoi_name === r.kepoi_name
-            );
-            return (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: 8,
-                  borderBottom: "1px solid rgba(255,255,255,0.03)",
-                  background: isLoaded
-                    ? "rgba(0, 120, 255, 0.2)"
-                    : "transparent",
-                  borderRadius: "6px",
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 700 }}>
-                    {r.kepoi_name || r.kepid || "unknown"}
-                  </div>
-                  <div style={{ fontSize: 12, color: "#bbb" }}>
-                    Period: {r.koi_period || r.pl_orbper || "—"}
-                  </div>
-                </div>
-                <div style={{ display: "flex", gap: 6 }}>
-                  {isLoaded ? (
-                    <button onClick={() => onUnloadCandidate(r)}>Unload</button>
-                  ) : (
-                    <button onClick={() => onLoadCandidate(r)}>Load</button>
-                  )}
-                  <button onClick={() => handlePredict(r)}>Predict</button>
+  // 🔹 Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!listRef.current) return;
+      const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+      if (scrollTop + clientHeight >= scrollHeight - 10) {
+        loadData();
+      }
+    };
+
+    const el = listRef.current;
+    if (el) el.addEventListener("scroll", handleScroll);
+    return () => el && el.removeEventListener("scroll", handleScroll);
+  }, [rows, loading]); // listen to rows & loading to avoid duplicate fetches
+
+  return (
+    <div style={{ padding: 8, marginBottom: 16 }}>
+      <h4>{listTitle}</h4>
+      <div
+        ref={listRef}
+        style={{
+          maxHeight: 300,
+          overflowY: "auto",
+          borderTop: "1px solid #222",
+        }}
+      >
+        {rows.length === 0 && !loading && (
+          <div style={{ padding: 8 }}>No results</div>
+        )}
+        {rows.map((r, i) => {
+          const id = r.kepoi_name || r.pl_name || r.kepid || `row-${i}`;
+          const isLoaded = loadedPlanets.some(
+            (p) => p.kepoi_name === r.kepoi_name
+          );
+          return (
+            <div
+              key={id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: 8,
+                borderBottom: "1px solid rgba(255,255,255,0.05)",
+                background: isLoaded ? "rgba(0, 120, 255, 0.2)" : "transparent",
+                borderRadius: "6px",
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 700 }}>{id}</div>
+                <div style={{ fontSize: 12, color: "#bbb" }}>
+                  Period: {r.koi_period || r.pl_orbper || "—"}
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+              <div style={{ display: "flex", gap: 6 }}>
+                {isLoaded ? (
+                  <button
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: 6,
+                      border: "none",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      background: isLoaded
+                        ? "linear-gradient(90deg, #ff4d4d, #ff1a1a)"
+                        : "linear-gradient(90deg, #4da6ff, #1a8cff)",
+                      color: "#fff",
+                      transition: "0.2s",
+                    }}
+                    onClick={() =>
+                      isLoaded ? onUnloadCandidate(r) : onLoadCandidate(r)
+                    }
+                  >
+                    {isLoaded ? "Unload" : "Load"}
+                  </button>
+                ) : (
+                  <button
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: 6,
+                      border: "none",
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      background: isLoaded
+                        ? "linear-gradient(90deg, #ff4d4d, #ff1a1a)"
+                        : "linear-gradient(90deg, #4da6ff, #1a8cff)",
+                      color: "#fff",
+                      transition: "0.2s",
+                    }}
+                    onClick={() =>
+                      isLoaded ? onUnloadCandidate(r) : onLoadCandidate(r)
+                    }
+                  >
+                    {isLoaded ? "Unload" : "Load"}
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+        {loading && <div style={{ padding: 8 }}>Loading...</div>}
+      </div>
     </div>
   );
 }
