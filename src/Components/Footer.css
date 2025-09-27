@@ -1,65 +1,112 @@
 .footer {
-  background: #161b22;
-  color: gray;
-  text-align: center;
-  padding: 20px 10px;
-  margin-top: 40px;
-  border-top: 1px solid #30363d;
-  bottom: auto;
-  width: 100%;
-}
-
-.footer p {
-  margin: 5px 0;
-}
-
-.footer-links {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.footer-links a {
-  color: #58a6ff;
-  text-decoration: none;
-  font-size: 14px;
-  transition: 0.3s ease;
-}
-
-.footer-links a:hover {
+  background: linear-gradient(to bottom, #0d1117, #0b0f14);
   color: #c9d1d9;
-}
-.footer {
-  background-color: #161b22;
-  color: #fff;
-  padding: 40px 20px;
+  border-top: 1px solid #30363d;
+  width: 100%;
+  font-family: "Segoe UI", sans-serif;
+  padding: 20px 15px 10px; /* reduced height */
 }
 
-.footer .FAtitle {
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1150px;
+  margin: 0 auto;
+  gap: 20px; /* smaller spacing */
+}
+
+.footer-section {
+  flex: 1 1 250px;
+  min-width: 200px;
+  text-align: center; /* ✅ center everything in this section */
+}
+
+.footer-title {
+  font-size: 14px; /* smaller font */
+  font-weight: 600;
+  margin-bottom: 8px;
   color: #58a6ff;
 }
 
-.ulfooter {
+.footer-text {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #aaa;
+  margin: 0 auto; /* ✅ keep it centered */
+  max-width: 280px; /* prevent text stretching too wide */
+}
+
+/* Quick Links */
+.footer-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.ulfooter li {
-  margin-bottom: 10px;
+.footer-list li {
+  margin-bottom: 6px;
 }
 
-.ulfooter li a {
-  color: #fff;
+.footer-link {
+  color: #c9d1d9;
   text-decoration: none;
+  transition: 0.3s ease;
+  font-size: 13px;
+  display: inline-block; /* ✅ centers the text properly */
 }
 
-.ulfooter li a:hover {
-  text-decoration: underline;
+.footer-link:hover {
+  color: #58a6ff;
+  margin-left: 3px;
+}
+
+/* Socials */
+.footer-socials {
+  display: flex;
+  justify-content: center; /* ✅ icons centered horizontally */
+  gap: 12px;
+  font-size: 18px; /* smaller icons */
+}
+
+.footer-socials a {
+  color: #c9d1d9;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.footer-socials a:hover {
+  color: #58a6ff;
+  transform: scale(1.15);
+}
+
+/* Bottom bar */
+.footer-bottom {
+  margin-top: 15px;
+  padding-top: 8px;
+  border-top: 1px solid #30363d;
+  text-align: center;
+}
+
+.footer-bottom span {
+  color: #58a6ff;
+  font-weight: 600;
 }
 
 .copyright {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 0.9rem;
+  font-size: 11px;
+  color: #aaa;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .footer-socials {
+    justify-content: center;
+  }
 }

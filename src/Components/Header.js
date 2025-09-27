@@ -1,36 +1,53 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom"; // use NavLink for active state
 import "./Header.css";
 
 const Navbar = () => {
   return (
-    <div className="divnavbar">
-      <nav className="navbar">
-        <div className="logo">CZMU</div>
-        <ul className="navMenu">
-          <li>
-            <Link className="lii" to="/">
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link className="lii" to="/dashboard">
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link className="lii" to="/storytelling">
-              Storytelling
-            </Link>
-          </li>
-          <li>
-            <Link className="lii" to="/game">
-              Planet Game
-            </Link>
-          </li>{" "}
-          {/* الرابط الجديد */}
-        </ul>
-      </nav>
+    <div className="navbar">
+      <div className="logo">CZMU</div>
+      <ul className="navMenu">
+        <li>
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive ? "navLink active" : "navLink"
+            }
+          >
+            Home
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              isActive ? "navLink active" : "navLink"
+            }
+          >
+            Dashboard
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/storytelling"
+            className={({ isActive }) =>
+              isActive ? "navLink active" : "navLink"
+            }
+          >
+            Storytelling
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/game"
+            className={({ isActive }) =>
+              isActive ? "navLink active" : "navLink"
+            }
+          >
+            Planet Game
+          </NavLink>
+        </li>
+      </ul>
     </div>
   );
 };

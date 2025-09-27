@@ -6,63 +6,66 @@ import SunTexture from "../../Assets/Sun.jpg";
 import SpaceTexture from "../../Assets/Space.png";
 import GanymedeTexture from "../../Assets/ganymede.jpg";
 
-export default function ThreeScene({
-  planets,
-  mode,
-  speed,
-  paused,
-  onSelectPlanet,
-}) {
+// 🔹 Global texture cache
+const textureCache = {};
+function loadTexture(url) {
+  if (!textureCache[url])
+    textureCache[url] = new THREE.TextureLoader().load(url);
+  return textureCache[url];
+}
+
+export default function ThreeScene({ planets, speed, paused, onSelectPlanet }) {
   const mountRef = useRef(null);
-  const planetsRef = useRef([]);
   const sceneRef = useRef(null);
   const rendererRef = useRef(null);
   const cameraRef = useRef(null);
   const sunRef = useRef(null);
   const controlsRef = useRef(null);
-
-  // store speed & paused without reloading scene
+  const planetsRef = useRef([]);
   const speedRef = useRef(speed);
   const pausedRef = useRef(paused);
 
+  // Update refs without re-rendering
   useEffect(() => {
     speedRef.current = speed;
   }, [speed]);
-
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
 
+  // 🔹 Init scene once
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
 
-    // Scene setup
     const scene = new THREE.Scene();
-
-    // Space background sphere
-    const spaceTex = new THREE.TextureLoader().load(SpaceTexture);
-    spaceTex.wrapS = THREE.RepeatWrapping;
-    spaceTex.wrapT = THREE.RepeatWrapping;
-    spaceTex.repeat.set(8, 8);
-
-    const spaceGeo = new THREE.SphereGeometry(2000, 64, 64);
-    const spaceMat = new THREE.MeshBasicMaterial({
-      map: spaceTex,
-      side: THREE.BackSide,
-    });
-    scene.add(new THREE.Mesh(spaceGeo, spaceMat));
     sceneRef.current = scene;
 
-    const width = mount.clientWidth || window.innerWidth;
-    const height = mount.clientHeight || window.innerHeight;
+    // Background
+    const spaceTex = loadTexture(SpaceTexture);
+    spaceTex.wrapS = spaceTex.wrapT = THREE.RepeatWrapping;
+    spaceTex.repeat.set(8, 8);
+    const spaceGeo = new THREE.SphereGeometry(2000, 64, 64);
+    scene.add(
+      new THREE.Mesh(
+        spaceGeo,
+        new THREE.MeshBasicMaterial({ map: spaceTex, side: THREE.BackSide })
+      )
+    );
 
-    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 5000);
+    // Camera
+    const camera = new THREE.PerspectiveCamera(
+      60,
+      mount.clientWidth / mount.clientHeight,
+      0.1,
+      5000
+    );
     camera.position.set(0, 60, 140);
     cameraRef.current = camera;
 
+    // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(width, height);
+    renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
@@ -74,88 +77,25 @@ export default function ThreeScene({
     scene.add(point);
 
     // Sun
-    const sunTex = new THREE.TextureLoader().load(SunTexture);
     const sun = new THREE.Mesh(
       new THREE.SphereGeometry(10, 48, 48),
-      new THREE.MeshBasicMaterial({ map: sunTex })
+      new THREE.MeshBasicMaterial({ map: loadTexture(SunTexture) })
     );
     scene.add(sun);
     sunRef.current = sun;
 
     // Glow
-    const spriteMaterial = new THREE.SpriteMaterial({
-      map: new THREE.CanvasTexture(makeGlowCanvas(256)),
-      color: 0xffdd99,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    const sprite = new THREE.Sprite(spriteMaterial);
+    const sprite = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: new THREE.CanvasTexture(makeGlowCanvas(256)),
+        color: 0xffdd99,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      })
+    );
     sprite.scale.set(80, 80, 1);
     scene.add(sprite);
-
-    // Planets
-    planetsRef.current = [];
-    const ORBIT_SCALE = 12;
-    const PLANET_SIZE_SCALE = 6;
-    const textureLoader = new THREE.TextureLoader();
-
-    planets.forEach((p, i) => {
-      const orbitBase = Number(p.pl_orbsmax || p.koi_period || (i + 1) * 0.6);
-      const orbitRadius = Math.max(6, orbitBase * ORBIT_SCALE);
-
-      const pivot = new THREE.Object3D();
-      scene.add(pivot);
-
-      const size = Math.max(
-        0.3,
-        Number(p.koi_radius || p.pl_rade || 1) * PLANET_SIZE_SCALE
-      );
-      const geo = new THREE.SphereGeometry(size, 32, 32);
-
-      // ✅ Force all planets to use ganymede.jpg
-      const mat = new THREE.MeshStandardMaterial({
-        map: textureLoader.load(GanymedeTexture),
-      });
-
-      const mesh = new THREE.Mesh(geo, mat);
-      mesh.position.set(orbitRadius, 0, 0);
-      mesh.userData = {
-        ...p,
-        orbitRadius,
-        orbitSpeed:
-          1 / Math.max(0.01, Number(p.pl_orbper || p.koi_period || i + 1)),
-        index: i,
-      };
-
-      pivot.add(mesh);
-      planetsRef.current.push({ mesh, pivot, data: p });
-
-      // Orbit line
-      const segments = 128;
-      const positions = new Float32Array(segments * 3);
-      for (let s = 0; s < segments; s++) {
-        const theta = (s / segments) * Math.PI * 2;
-        positions[s * 3] = Math.cos(theta) * orbitRadius;
-        positions[s * 3 + 1] = 0;
-        positions[s * 3 + 2] = Math.sin(theta) * orbitRadius;
-      }
-      const orbitGeom = new THREE.BufferGeometry();
-      orbitGeom.setAttribute(
-        "position",
-        new THREE.BufferAttribute(positions, 3)
-      );
-      const orbitLine = new THREE.LineLoop(
-        orbitGeom,
-        new THREE.LineBasicMaterial({
-          color: 0x333444,
-          opacity: 0.6,
-          transparent: true,
-        })
-      );
-      orbitLine.rotation.y = Math.PI / 2;
-      scene.add(orbitLine);
-    });
 
     // Controls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -163,11 +103,10 @@ export default function ThreeScene({
     controls.dampingFactor = 0.08;
     controlsRef.current = controls;
 
-    // Raycaster for clicks
+    // Raycaster
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
-
-    function onClick(e) {
+    const onClick = (e) => {
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -180,14 +119,14 @@ export default function ThreeScene({
         const original = hit.scale.clone();
         hit.scale.set(original.x * 1.18, original.y * 1.18, original.z * 1.18);
         setTimeout(() => hit.scale.copy(original), 300);
-        onSelectPlanet(hit.userData);
+        onSelectPlanet?.(hit.userData);
       }
-    }
+    };
     renderer.domElement.addEventListener("click", onClick);
 
-    // Animate
+    // Animate loop
     let raf = null;
-    function animate() {
+    const animate = () => {
       raf = requestAnimationFrame(animate);
       if (!pausedRef.current) {
         if (sunRef.current)
@@ -200,17 +139,15 @@ export default function ThreeScene({
       }
       controls.update();
       renderer.render(scene, camera);
-    }
+    };
     animate();
 
-    // Resize
-    function onResize() {
-      const w = mount.clientWidth || window.innerWidth;
-      const h = mount.clientHeight || window.innerHeight;
-      camera.aspect = w / h;
+    // Resize handler
+    const onResize = () => {
+      camera.aspect = mount.clientWidth / mount.clientHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    }
+      renderer.setSize(mount.clientWidth, mount.clientHeight);
+    };
     window.addEventListener("resize", onResize);
 
     return () => {
@@ -220,7 +157,83 @@ export default function ThreeScene({
       mount.removeChild(renderer.domElement);
       renderer.dispose();
     };
-  }, [planets, onSelectPlanet]); // keep deps minimal
+  }, []);
+
+  // 🔹 Incremental planet updates (only when `planets` changes)
+  useEffect(() => {
+    if (!sceneRef.current) return;
+    const ORBIT_SCALE = 12,
+      PLANET_SIZE_SCALE = 6;
+
+    // Add new planets
+    planets.forEach((p, i) => {
+      if (planetsRef.current.some((pl) => pl.data.kepoi_name === p.kepoi_name))
+        return;
+
+      const orbitBase = Number(p.pl_orbsmax || p.koi_period || (i + 1) * 0.6);
+      const orbitRadius = Math.max(6, orbitBase * ORBIT_SCALE);
+
+      const pivot = new THREE.Object3D();
+      sceneRef.current.add(pivot);
+
+      const size = Math.max(
+        0.3,
+        Number(p.koi_radius || p.pl_rade || 1) * PLANET_SIZE_SCALE
+      );
+      const geo = new THREE.SphereGeometry(size, 32, 32);
+      const mat = new THREE.MeshStandardMaterial({
+        map: loadTexture(GanymedeTexture),
+      });
+
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(orbitRadius, 0, 0);
+      mesh.userData = {
+        ...p,
+        orbitRadius,
+        orbitSpeed:
+          1 / Math.max(0.01, Number(p.pl_orbper || p.koi_period || i + 1)),
+        index: i,
+      };
+      pivot.add(mesh);
+
+      // Orbit line
+      const segments = 128;
+      const positions = new Float32Array(segments * 3);
+      for (let s = 0; s < segments; s++) {
+        const theta = (s / segments) * Math.PI * 2;
+        positions[s * 3] = Math.cos(theta) * orbitRadius;
+        positions[s * 3 + 1] = 0;
+        positions[s * 3 + 2] = Math.sin(theta) * orbitRadius;
+      }
+      const orbitLine = new THREE.LineLoop(
+        new THREE.BufferGeometry().setAttribute(
+          "position",
+          new THREE.BufferAttribute(positions, 3)
+        ),
+        new THREE.LineBasicMaterial({
+          color: 0x333444,
+          opacity: 0.6,
+          transparent: true,
+        })
+      );
+      orbitLine.rotation.y = Math.PI / 2;
+      sceneRef.current.add(orbitLine);
+
+      planetsRef.current.push({ mesh, pivot, orbitLine, data: p });
+    });
+
+    // Remove deleted planets
+    planetsRef.current = planetsRef.current.filter(
+      ({ data, pivot, orbitLine }) => {
+        const exists = planets.some((p) => p.kepoi_name === data.kepoi_name);
+        if (!exists) {
+          sceneRef.current.remove(pivot);
+          sceneRef.current.remove(orbitLine);
+        }
+        return exists;
+      }
+    );
+  }, [planets]);
 
   return <div ref={mountRef} style={{ width: "100%", height: "100%" }} />;
 }

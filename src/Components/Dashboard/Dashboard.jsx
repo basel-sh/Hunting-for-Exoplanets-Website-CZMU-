@@ -1,53 +1,74 @@
-// src/components/Dashboard/Dashboard.jsx
-import React, { useState } from "react";
-import planetsData from "./samplePlanets.json";
+import React, { useState, useEffect } from "react";
 import ThreeScene from "./ThreeScene";
 import PlanetInfoPanel from "./PlanetInfoPanel";
 import ScientistOverview from "./ScientistOverview";
 import CandidatesList from "./CandidatesList";
-import { predictPlanetAPI } from "./api";
 import "./dashboardStyles.css";
 
-export default function Dashboard() {
-  const [mode, setMode] = useState("kid"); // "kid" or "scientist"
+export default function Dashboard({ initialPlanets = [] }) {
+  const [mode, setMode] = useState("kid");
   const [speed, setSpeed] = useState(1.0);
   const [paused, setPaused] = useState(false);
-  const [selected, setSelected] = useState(null);
-  const [prediction, setPrediction] = useState(null);
-  const [planets, setPlanets] = useState(planetsData);
+  const [planets, setPlanets] = useState(initialPlanets);
 
-  const handleSelectPlanet = (planet) => {
-    setSelected(planet);
-    setPrediction(null);
-    predictPlanetAPI(planet).then((res) => setPrediction(res));
-  };
+  // Warning state with countdown
+  const [warning, setWarning] = useState({ message: "", count: 0 });
 
-  // Called when user selects a candidate from CSV list
   const handleLoadCandidate = (candidate) => {
-    setSelected(candidate);
-    setPrediction(null);
-    predictPlanetAPI(candidate).then((res) => setPrediction(res));
-    // Add to 3D scene if not already present
+    if (planets.length >= 2) {
+      setWarning({
+        message:
+          "⚠️ You can only render 2 samples at a time. Unload one to add another.",
+        count: 3, // countdown in seconds
+      });
+      return;
+    }
     setPlanets((prev) => {
       if (prev.some((p) => p.kepoi_name === candidate.kepoi_name)) return prev;
       return [...prev, candidate];
     });
   };
 
+  const handleUnloadCandidate = (candidate) => {
+    setPlanets((prev) =>
+      prev.filter((p) => p.kepoi_name !== candidate.kepoi_name)
+    );
+  };
+
+  // Countdown effect
+  useEffect(() => {
+    if (warning.count <= 0) return;
+    const timer = setInterval(() => {
+      setWarning((prev) => ({ ...prev, count: prev.count - 1 }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [warning.count]);
+
+  const closeWarning = () => setWarning({ message: "", count: 0 });
+
   return (
     <div className="czmu-dashboard-root">
-      {/* Left 3D area */}
       <div className="czmu-left">
         <ThreeScene
           planets={planets}
           mode={mode}
           speed={speed}
           paused={paused}
-          onSelectPlanet={handleSelectPlanet}
+          onSelectPlanet={() => {}}
         />
+
+        {/* Warning with countdown and close button */}
+        {warning.count > 0 && (
+          <div className="czmu-warning">
+            <span>{warning.message}</span>
+            <span className="countdown">{warning.count}</span>
+            <button className="close-btn" onClick={closeWarning}>
+              ×
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Right panels */}
       <aside className="czmu-right">
         <div className="czmu-header">
           <h2>CZMU Dashboard</h2>
@@ -81,10 +102,15 @@ export default function Dashboard() {
         </div>
 
         <div className="info-panel">
-          {selected ? (
-            <PlanetInfoPanel selected={selected} prediction={prediction} />
-          ) : (
-            <div className="no-select">Click a planet to inspect it</div>
+          {planets.length === 0 && (
+            <div className="no-select">Load a planet to inspect it</div>
+          )}
+          {planets.length === 1 && <PlanetInfoPanel selected={planets[0]} />}
+          {planets.length === 2 && (
+            <div className="comparison">
+              <PlanetInfoPanel selected={planets[0]} />
+              <PlanetInfoPanel selected={planets[1]} />
+            </div>
           )}
         </div>
 
@@ -96,7 +122,11 @@ export default function Dashboard() {
 
         <div className="candidates-section">
           <h4>Candidates (CSV)</h4>
-          <CandidatesList onLoadCandidate={handleLoadCandidate} />
+          <CandidatesList
+            loadedPlanets={planets}
+            onLoadCandidate={handleLoadCandidate}
+            onUnloadCandidate={handleUnloadCandidate}
+          />
         </div>
       </aside>
     </div>

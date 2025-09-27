@@ -3,7 +3,6 @@ import axios from "axios";
 
 const BASE_URL = "https://engbasel-kepler-ml-datasets.hf.space";
 
-// Predict single planet
 export async function predictPlanetAPI(planet) {
   try {
     const payload = {
@@ -16,7 +15,17 @@ export async function predictPlanetAPI(planet) {
     const res = await axios.post(`${BASE_URL}/predict_json`, payload, {
       timeout: 10000,
     });
-    return res.data;
+
+    // Adapt to backend response
+    if (res.data?.predictions?.length > 0) {
+      const pred = res.data.predictions[0];
+      return {
+        label: pred.final_label,
+        probability: pred.prob_planet,
+      };
+    }
+
+    return null;
   } catch (err) {
     console.error("/predict_json error:", err?.response || err?.message || err);
     return null;

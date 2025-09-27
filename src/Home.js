@@ -1,11 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import Navbar from "./Components/Header";
 import * as THREE from "three";
 import "./Components/ProjectCards.css";
 import "./style.css"; // CSS لترتيب الصفحة والفوتر
 import "./Components/PlanetGame.css"; // CSS للعبة
 import HabitablePlanets from "./Components/HabitablePlanets";
-import Footer from "./Components/Footer";
 import PlanetGame from "./Components/PlanetGame"; // اللعبة
 
 export default function Home() {
@@ -61,16 +59,34 @@ export default function Home() {
 
   // بيانات مبدئية للعبة (يمكن استبدالها لاحقًا بالـ backend)
   const gamePlanets = [
-    { name: "Kepler-22b", habitable: true, radius: "2.4 Earth radii", distance: "600 ly" },
-    { name: "Proxima Centauri b", habitable: true, radius: "1.3 Earth radii", distance: "4.2 ly" },
-    { name: "TRAPPIST-1d", habitable: false, radius: "0.77 Earth radii", distance: "40 ly" },
-    { name: "Kepler-442b", habitable: true, radius: "1.34 Earth radii", distance: "1200 ly" }
+    {
+      name: "Kepler-22b",
+      habitable: true,
+      radius: "2.4 Earth radii",
+      distance: "600 ly",
+    },
+    {
+      name: "Proxima Centauri b",
+      habitable: true,
+      radius: "1.3 Earth radii",
+      distance: "4.2 ly",
+    },
+    {
+      name: "TRAPPIST-1d",
+      habitable: false,
+      radius: "0.77 Earth radii",
+      distance: "40 ly",
+    },
+    {
+      name: "Kepler-442b",
+      habitable: true,
+      radius: "1.34 Earth radii",
+      distance: "1200 ly",
+    },
   ];
 
   return (
     <div className="home-container">
-      <Navbar />
-
       {/* البانر */}
       <section className="main">
         <div>
@@ -105,8 +121,8 @@ export default function Home() {
           <div className="card">
             <h3>Problem</h3>
             <p>
-              Thousands of exoplanets data exist, but most are analyzed manually,
-              which is slow and tedious.
+              Thousands of exoplanets data exist, but most are analyzed
+              manually, which is slow and tedious.
             </p>
           </div>
 
@@ -134,12 +150,7 @@ export default function Home() {
       {/* لعبة اكتشاف الكواكب */}
       <section className="game-section">
         <h2>Test Your Skills!</h2>
-        
       </section>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }
-

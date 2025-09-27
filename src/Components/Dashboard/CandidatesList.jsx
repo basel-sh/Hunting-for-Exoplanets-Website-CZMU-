@@ -3,14 +3,17 @@ import React, { useEffect, useState } from "react";
 import Papa from "papaparse";
 import { predictPlanetAPI } from "./api";
 
-export default function CandidatesList({ onLoadCandidate }) {
+export default function CandidatesList({
+  loadedPlanets,
+  onLoadCandidate,
+  onUnloadCandidate,
+}) {
   const [rows, setRows] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // load CSV from public/kepler_koi.csv
     setLoading(true);
     fetch("/kepler_koi.csv")
       .then((r) => r.text())
@@ -20,15 +23,14 @@ export default function CandidatesList({ onLoadCandidate }) {
           dynamicTyping: true,
           skipEmptyLines: true,
           complete: (results) => {
-            // Only keep CANDIDATEs
             const candidates = results.data.filter(
               (row) =>
                 (row.koi_disposition === "CANDIDATE" ||
                   row.koi_pdisposition === "CANDIDATE") &&
-                row.kepoi_name // must have a name
+                row.kepoi_name
             );
             setRows(candidates);
-            setFiltered(candidates); // show all by default
+            setFiltered(candidates);
             setLoading(false);
           },
         });
@@ -87,30 +89,43 @@ export default function CandidatesList({ onLoadCandidate }) {
           {filtered.length === 0 && (
             <div style={{ padding: 8 }}>No results</div>
           )}
-          {filtered.map((r, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: 8,
-                borderBottom: "1px solid rgba(255,255,255,0.03)",
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 700 }}>
-                  {r.kepoi_name || r.kepid || "unknown"}
+          {filtered.map((r, i) => {
+            const isLoaded = loadedPlanets.some(
+              (p) => p.kepoi_name === r.kepoi_name
+            );
+            return (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: 8,
+                  borderBottom: "1px solid rgba(255,255,255,0.03)",
+                  background: isLoaded
+                    ? "rgba(0, 120, 255, 0.2)"
+                    : "transparent",
+                  borderRadius: "6px",
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 700 }}>
+                    {r.kepoi_name || r.kepid || "unknown"}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#bbb" }}>
+                    Period: {r.koi_period || r.pl_orbper || "—"}
+                  </div>
                 </div>
-                <div style={{ fontSize: 12, color: "#bbb" }}>
-                  Period: {r.koi_period || r.pl_orbper || "—"}
+                <div style={{ display: "flex", gap: 6 }}>
+                  {isLoaded ? (
+                    <button onClick={() => onUnloadCandidate(r)}>Unload</button>
+                  ) : (
+                    <button onClick={() => onLoadCandidate(r)}>Load</button>
+                  )}
+                  <button onClick={() => handlePredict(r)}>Predict</button>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => onLoadCandidate(r)}>Load</button>
-                <button onClick={() => handlePredict(r)}>Predict</button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

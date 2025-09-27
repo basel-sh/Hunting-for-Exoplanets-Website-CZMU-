@@ -12,8 +12,7 @@ import {
 import { synthesizeLightCurve } from "./utils";
 
 export default function PlanetInfoPanel({ selected, prediction }) {
-  if (!selected)
-    return <div style={{ padding: 12 }}>Click a planet to inspect it.</div>;
+  if (!selected) return null;
 
   const lc = synthesizeLightCurve(selected);
   const name =
@@ -24,12 +23,13 @@ export default function PlanetInfoPanel({ selected, prediction }) {
     selected.kepid;
 
   return (
-    <div style={{ padding: 12 }}>
+    <div style={{ padding: 14, marginBottom: 12 }}>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          marginBottom: 10,
         }}
       >
         <h3 style={{ margin: 0 }}>{name}</h3>
@@ -38,7 +38,7 @@ export default function PlanetInfoPanel({ selected, prediction }) {
         </div>
       </div>
 
-      <div style={{ marginTop: 8 }}>
+      <div style={{ marginBottom: 8, lineHeight: 1.6 }}>
         <div>
           <strong>Period:</strong>{" "}
           {selected.pl_orbper || selected.koi_period || "—"} days
@@ -59,9 +59,9 @@ export default function PlanetInfoPanel({ selected, prediction }) {
         <div
           style={{
             marginTop: 10,
-            padding: 8,
-            borderRadius: 6,
-            background: "rgba(255,255,255,0.03)",
+            padding: 10,
+            borderRadius: 8,
+            background: "rgba(255,255,255,0.05)",
           }}
         >
           <div style={{ fontWeight: 700 }}>
@@ -73,7 +73,7 @@ export default function PlanetInfoPanel({ selected, prediction }) {
         </div>
       )}
 
-      <div style={{ width: "100%", height: 140, marginTop: 12 }}>
+      <div style={{ width: "100%", height: 140, marginTop: 14 }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={lc}

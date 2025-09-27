@@ -1,13 +1,14 @@
+import { Route, Routes, useLocation } from "react-router-dom";
 import Footer from "./Components/Footer";
-import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import Navbar from "./Components/Header";
 import Home from "./Home";
 import Storytelling from "./Components/Storytelling";
-import PlanetGame from "./Components/PlanetGame"; // اللعبة
+import PlanetGame from "./Components/PlanetGame";
 
 export default function App() {
-  // بيانات مبدئية للعبة (يمكن استبدالها بالـ backend لاحقًا)
+  const location = useLocation(); // ✅ get current route
+
   const gamePlanets = [
     {
       name: "Kepler-22b",
@@ -37,59 +38,29 @@ export default function App() {
 
   return (
     <>
-      {/* ✅ CSS directly inside App.jsx */}
       <style>{`
-        .mainappdiv {
-          display: flex;
-          flex-direction: column;
-          min-height: 100vh;
-          background: #0a0a0f;
-          color: #fff;
-        }
-
         .main-content {
           flex: 1;
-          padding-top: 70px; /* نفس ارتفاع النافبار */
-
-
+          padding-top: 60px; /* navbar height */
         }
-
-        .navbar {
-          background: #0d1117; /* خلفية غامقة */
-          color: #fff;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 15px 40px;
-          position: sticky;
-          top: 0;
-          z-index: 1000;
-        }
-
       `}</style>
 
       <div className="mainappdiv">
         <Navbar />
         <div className="main-content">
           <Routes>
-            {/* Dashboard */}
             <Route path="/dashboard" element={<Dashboard />} />
-
-            {/* Home */}
             <Route path="/" element={<Home />} />
-
-            {/* Storytelling */}
             <Route path="/storytelling" element={<Storytelling />} />
-
-            {/* Planet Game */}
             <Route
               path="/game"
               element={<PlanetGame planets={gamePlanets} />}
             />
           </Routes>
         </div>
-        {/* Footer ثابت لكل الصفحات */}
-        <Footer />
+
+        {/* ✅ Only show footer if not on dashboard */}
+        {location.pathname !== "/dashboard" && <Footer />}
       </div>
     </>
   );
