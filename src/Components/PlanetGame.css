@@ -1,58 +1,323 @@
+/* ---------------------------
+   تنسيقات اللعبة الأساسية
+--------------------------- */
 .planet-game {
-  background: linear-gradient(135deg, #6e8efb, #a777e3);
-  color: #fff;
-  padding: 30px;
-  border-radius: 20px;
-  max-width: 500px;
-  margin: 40px auto;
   text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  color: #e0f7ff;
+  background: radial-gradient(circle at center, #001022, #000010 80%);
+  padding: 30px 25px 40px;
+  border-radius: 25px;
+  box-shadow: 0 0 30px 5px rgba(0, 200, 255, 0.4), inset 0 0 50px 10px #002244;
+  max-width: 720px;
+  margin: 40px auto;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
 }
 
-.planet-game h2 {
-  color: #fff200;
-  font-size: 2rem;
-  margin-bottom: 20px;
+/* خلفية نجمية متحركة */
+.planet-game::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(white 1px, transparent 2px);
+  background-size: 20px 20px;
+  animation: starfield 60s linear infinite;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.planet-game h3 {
-  color: #ff6f61;
-  font-size: 1.5rem;
-  margin-bottom: 10px;
+@keyframes starfield {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 1000px 1000px;
+  }
 }
 
+/* صورة الكوكب */
 .planet-img {
-  width: 150px;
-  height: 150px;
-  margin: 10px auto;
-  display: block;
+  width: 240px;
+  height: 240px;
+  object-fit: contain;
+  margin: 25px auto 15px;
   border-radius: 50%;
-  border: 3px solid #fff200;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  background: radial-gradient(circle at center, #111a2a, #000a12);
+  border: 4px solid #00d4ff;
+  box-shadow: 0 0 30px 6px rgba(0, 212, 255, 0.8), inset 0 0 15px 3px #00aaff;
+  animation: floatPlanet 4s ease-in-out infinite,
+    glowPulse 3s ease-in-out infinite;
+  z-index: 1;
+  position: relative;
+}
+
+@keyframes floatPlanet {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 30px 6px rgba(0, 212, 255, 0.8), inset 0 0 15px 3px #00aaff;
+  }
+  50% {
+    box-shadow: 0 0 45px 10px rgba(0, 255, 255, 1), inset 0 0 25px 5px #00ffff;
+  }
+}
+
+/* أزرار اللعبة */
+.game-buttons {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  z-index: 2;
+  position: relative;
 }
 
 .game-buttons button {
-  margin: 10px;
-  padding: 15px 25px;
-  background-color: #ffb347;
+  background: linear-gradient(145deg, #00c8ff, #0088cc);
+  color: #000;
   border: none;
+  padding: 14px 32px;
   border-radius: 15px;
-  color: #161b22;
-  cursor: pointer;
-  font-weight: bold;
   font-size: 1.2rem;
-  transition: transform 0.2s, background-color 0.3s ease;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 200, 255, 0.6),
+    inset 0 -3px 5px rgba(0, 150, 200, 0.8);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease,
+    background 0.3s ease;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-buttons button::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.3) 20%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  border-radius: 15px;
+  z-index: 1;
+}
+
+.game-buttons button:hover::before {
+  opacity: 1;
 }
 
 .game-buttons button:hover {
-  background-color: #ffcc70;
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(-3deg);
+  background: linear-gradient(145deg, #00e0ff, #00aacc);
+  box-shadow: 0 8px 25px rgba(0, 230, 255, 0.9),
+    inset 0 -5px 8px rgba(0, 180, 230, 1);
 }
 
-.planet-game p {
-  font-size: 1.2rem;
-  margin-top: 15px;
+.game-buttons button:active {
+  transform: scale(0.95) rotate(0deg);
+  box-shadow: 0 3px 10px rgba(0, 150, 200, 0.7),
+    inset 0 -2px 4px rgba(0, 120, 180, 0.9);
 }
 
+/* ---------------------------
+   الشخصيات + البالونات
+--------------------------- */
+.character-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
 
+.character-img {
+  width: 150px;
+  height: auto;
+  animation: floatCharacter 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(0, 191, 255, 0.8));
+  border-radius: 20px;
+  transition: filter 0.3s ease;
+  cursor: default;
+  user-select: none;
+}
+
+.character-img:hover {
+  filter: drop-shadow(0 0 30px rgba(0, 255, 255, 1));
+  transform: scale(1.05);
+}
+
+@keyframes floatCharacter {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* بالون الحوار */
+.speech-bubble {
+  position: relative;
+  background: rgba(0, 0, 0, 0.9);
+  border: 3px solid #00c8ff;
+  border-radius: 20px;
+  padding: 16px 22px;
+  max-width: 280px;
+  color: #b9faff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.6),
+    inset 0 0 15px rgba(0, 255, 255, 0.3);
+  animation: fadeInScale 0.6s ease forwards;
+  text-align: left;
+  user-select: none;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  cursor: default;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 14px 25px 14px 0;
+  border-style: solid;
+  border-color: transparent rgba(0, 0, 0, 0.9) transparent transparent;
+  filter: drop-shadow(-2px 0 2px rgba(0, 0, 0, 0.3));
+}
+
+/* حالات الحوارات */
+.speech-bubble.confirmed {
+  border-color: #00ff88;
+  color: #00ff88;
+  text-shadow: 0 0 12px #00ff88;
+  background: rgba(0, 40, 20, 0.9);
+  box-shadow: 0 0 25px #00ff88, inset 0 0 20px #00ff88;
+}
+
+.speech-bubble.candidate {
+  border-color: #ffdd00;
+  color: #ffdd00;
+  text-shadow: 0 0 12px #ffdd00;
+  background: rgba(40, 40, 0, 0.9);
+  box-shadow: 0 0 25px #ffdd00, inset 0 0 20px #ffdd00;
+}
+
+.speech-bubble.false {
+  border-color: #ff4444;
+  color: #ff4444;
+  text-shadow: 0 0 12px #ff4444;
+  background: rgba(40, 0, 0, 0.9);
+  box-shadow: 0 0 25px #ff4444, inset 0 0 20px #ff4444;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* نصوص وعناوين */
+h2 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #00e5ff;
+  text-shadow: 0 0 10px #00e5ff, 0 0 20px #00aaff;
+  margin-bottom: 15px;
+  user-select: none;
+}
+
+h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #00c8ff;
+  text-shadow: 0 0 8px #00c8ff;
+  margin: 10px 0 5px;
+  user-select: none;
+}
+
+p {
+  font-size: 1.1rem;
+  color: #a0dfff;
+  margin: 4px 0;
+  user-select: none;
+}
+
+/* زر الفيديو والقصة */
+button {
+  outline: none;
+  user-select: none;
+}
+
+/* زر إعادة اللعب */
+button:focus-visible {
+  outline: 2px solid #00c8ff;
+  outline-offset: 3px;
+}
+
+/* تحميل النص */
+p.loading {
+  font-style: italic;
+  color: #66cfff;
+  text-shadow: 0 0 5px #66cfff;
+}
+
+/* تحسينات عامة */
+@media (max-width: 768px) {
+  .planet-game {
+    max-width: 95%;
+    padding: 20px 15px 30px;
+  }
+
+  .planet-img {
+    width: 180px;
+    height: 180px;
+  }
+
+  .character-img {
+    width: 120px;
+  }
+
+  .speech-bubble {
+    max-width: 220px;
+    font-size: 1rem;
+  }
+
+  .game-buttons button {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
+}
