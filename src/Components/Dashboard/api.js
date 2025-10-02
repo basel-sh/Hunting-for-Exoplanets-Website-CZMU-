@@ -9,6 +9,7 @@ export async function fetchKeplerCandidatesAPI(offset = 0, limit = 10) {
       `${BASE_URL}/candidates_kepler_only?offset=${offset}&limit=${limit}`,
       { timeout: 20000 }
     );
+    console.log(res.data);
     return res.data ?? [];
   } catch (err) {
     console.error(
@@ -32,7 +33,7 @@ export async function fetchTESSCandidatesAPI(offset = 0, limit = 10) {
     return data.map((planet) => ({
       kepoi_name: planet.toidisplay || planet.toi || planet.tid,
       pl_orbper: planet.pl_orbper,
-      pl_rade: planet.pl_rade,
+      pl_rade: planet.pl_rade / 11.2, // convert Earth radii to Jupiter radii
       pl_insol: planet.pl_insol,
       pl_eqt: planet.pl_eqt,
       pl_trandurh: planet.pl_trandurh,
@@ -40,6 +41,7 @@ export async function fetchTESSCandidatesAPI(offset = 0, limit = 10) {
       st_dist: planet.st_dist,
       st_teff: planet.st_teff,
       st_rad: planet.st_rad,
+      pl_orbsmax: planet.pl_orbper ? planet.pl_orbper * 10 : (offset + 1) * 2,
       // add any other keys you need for display or prediction
     }));
   } catch (err) {
@@ -70,22 +72,6 @@ export async function predictPlanetAPI(planet) {
     return null;
   } catch (err) {
     console.error("/predict_json error:", err?.response || err?.message || err);
-    return null;
-  }
-}
-
-// 🔹 Predict from CSV upload
-export async function predictCSVAPI(file) {
-  try {
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await axios.post(`${BASE_URL}/predict_csv`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      timeout: 20000,
-    });
-    return res.data;
-  } catch (err) {
-    console.error("/predict_csv error:", err?.response || err?.message || err);
     return null;
   }
 }

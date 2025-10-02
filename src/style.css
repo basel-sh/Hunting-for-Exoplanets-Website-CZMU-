@@ -2,58 +2,111 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ruwudu:wght@600&display=swap");
 
 * {
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
   font-weight: 500;
 }
-body {
-  height: 100vh;
-}
-.mainappdiv {
-  height: 100vh;
+
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: rgba(13, 17, 23, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
   display: flex;
-  justify-content: center;
-  flex-direction: column;
+  align-items: center;
+  padding: 0 20px;
+  color: #e6edf3;
 }
-/* ///////////////Home///////////////// */
-.home-container {
-  margin-top: 8vh;
-  margin-bottom: auto;
-  /* background-image: url('./Assets/HomePageback.png'); */
+
+.navbar .logo {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #4fc3f7;
+}
+
+/* Background Particles CSS */
+#tsparticles {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  margin-top: 60px;
+  z-index: -2;
 }
 
-.main {
-  width: 100%;
-  display: flex;
-  height: 90vh;
-  align-items: center;
-  padding-left: 5%;
-  background-color: #fff;
-}
-
-/* Home Page Styling */
-.home-container {
-  font-family: "Poppins", sans-serif;
-  background-color: #0d1117; /* نفس خلفية المشهد */
+body {
+  background: radial-gradient(ellipse at center, #000011 0%, #000000 100%);
   color: #e6edf3;
+  overflow-x: hidden;
+}
+
+/* نجوم CSS */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, #ffffff88, transparent 70%),
+    radial-gradient(1.5px 1.5px at 50% 80%, #ffffffaa, transparent 70%),
+    radial-gradient(1px 1px at 80% 40%, #ffffffcc, transparent 70%),
+    radial-gradient(1.2px 1.2px at 70% 20%, #ffffffbb, transparent 70%),
+    radial-gradient(1.8px 1.8px at 30% 70%, #ffffff99, transparent 70%);
+  background-repeat: repeat;
+  background-size: 100px 100px;
+  animation: starMove 120s linear infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes starMove {
+  0% { background-position: 0 0,0 0,0 0,0 0,0 0; }
+  100% { background-position: 1000px 1000px,800px 1200px,1200px 800px,900px 1100px,1100px 900px; }
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 150vw;
+  height: 150vh;
+  background: radial-gradient(circle at center, rgba(0,100,255,0.15), transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: glowPulse 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.3; }
+}
+
+/* Home Container */
+.home-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
+  padding-top: 60px;
 }
 
-/* البانر */
+/* Banner */
 .main {
   text-align: center;
   padding: 80px 20px;
-  background: linear-gradient(180deg, #0d1117, #161b22);
+  background-color: rgba(13, 17, 23, 0.3); /* شفاف */
 }
 
 .main h2 {
@@ -63,9 +116,7 @@ body {
   color: darkblue;
 }
 
-.main h2 span {
-  color: #4fc3f7; /* لون مميز للكلمة */
-}
+.main h2 span { color: #4fc3f7; }
 
 .main h3 {
   font-size: 1.2rem;
@@ -73,16 +124,17 @@ body {
   color: #a5b1c2;
 }
 
-/* الكوكب */
+/* Planet Section */
 .planet-section {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-around;
   padding: 50px 20px;
-  background: #161b22;
+  background-color: rgba(22, 27, 34, 0.3); /* شفاف */
 }
 
+/* Planet Container */
 .planet-container {
   flex: 1;
   min-width: 350px;
@@ -91,24 +143,50 @@ body {
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.1); /* شفاف خفيف يظهر النجوم خلفه */
+  backdrop-filter: blur(4px); /* optional: تضيف تأثير ضبابي لطيف */
 }
 
-/* المعلومات جنب الكوكب */
+/* Planet Info */
 .planet-info {
   flex: 1;
   min-width: 300px;
   padding: 20px;
   text-align: left;
+  background: rgba(0, 0, 0, 0.1); /* خلفية شفافة */
+  backdrop-filter: blur(4px);       /* تأثير ضبابي لطيف */
+  border-radius: 15px;              /* لتكون حوافها ناعمة */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* ظل خفيف */
 }
 
-.planet-info h2 {
-  font-size: 2rem;
-  margin-bottom: 15px;
-  color: #58a6ff;
+
+.planet-info h2 { color: #58a6ff; }
+.planet-info p { color: #c9d1d9; }
+
+/* Project Cards */
+.project-cards {
+  padding: 50px 20px;
+  background-color: rgba(13,17,23,0.3); /* شفاف */
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
-.planet-info p {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: #c9d1d9;
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
 }
+
+.card {
+  flex: 1;
+  min-width: 250px;
+  max-width: 300px;
+  background-color: rgba(22,27,34,0.3); /* شفاف */
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+
+

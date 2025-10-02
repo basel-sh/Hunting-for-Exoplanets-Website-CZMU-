@@ -1,7 +1,10 @@
 import React from "react";
 import Navbar from "./Header";
 
-export default function Storytelling() {
+
+
+
+export default function About_us() {
   return (
     <div className="storytelling-container">
       <Navbar />

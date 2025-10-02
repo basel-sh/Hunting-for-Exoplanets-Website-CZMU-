@@ -13,7 +13,7 @@ export default function Dashboard({ initialPlanets = [] }) {
   const [planets, setPlanets] = useState(initialPlanets);
   const [warning, setWarning] = useState({ message: "", count: 0 });
 
-  // 🔹 Load a candidate into the scene
+  // Load a candidate
   const handleLoadCandidate = (candidate) => {
     if (planets.length >= 2) {
       setWarning({
@@ -30,14 +30,14 @@ export default function Dashboard({ initialPlanets = [] }) {
     );
   };
 
-  // 🔹 Unload a candidate from the scene
+  // Unload candidate
   const handleUnloadCandidate = (candidate) => {
     setPlanets((prev) =>
       prev.filter((p) => p.kepoi_name !== candidate.kepoi_name)
     );
   };
 
-  // 🔹 Countdown for warnings
+  // Warning countdown
   useEffect(() => {
     if (warning.count <= 0) return;
     const timer = setInterval(() => {
@@ -49,7 +49,8 @@ export default function Dashboard({ initialPlanets = [] }) {
   const closeWarning = () => setWarning({ message: "", count: 0 });
 
   return (
-    <div className="czmu-dashboard-root">
+    <div className={`czmu-dashboard-root ${mode}`}>
+      {/* LEFT SIDE (3D Scene) */}
       <div className="czmu-left">
         <ThreeScene
           planets={planets}
@@ -70,53 +71,93 @@ export default function Dashboard({ initialPlanets = [] }) {
         )}
       </div>
 
+      {/* RIGHT SIDE PANEL */}
       <aside className="czmu-right">
+        {/* Header */}
         <div className="czmu-header">
-          <h2>CZMU Dashboard</h2>
+          <h2 className="czmu-title">
+            {mode === "kid"
+              ? "🌈 CZMU Space Playground"
+              : "🔬 CZMU Research Lab"}
+          </h2>
           <div className="mode-switch">
             <button
               className={mode === "kid" ? "active" : ""}
               onClick={() => setMode("kid")}
             >
-              Kid
+              Kid Mode 🌟
             </button>
             <button
               className={mode === "scientist" ? "active" : ""}
               onClick={() => setMode("scientist")}
             >
-              Scientist
+              Scientist Mode 📊
             </button>
           </div>
         </div>
 
+        {/* Controls */}
         <div className="controls">
           <button onClick={() => setPaused(!paused)}>
-            {paused ? "Resume" : "Pause"}
+            {paused ? "▶️ Resume" : "⏸️ Pause"}
           </button>
-          <button onClick={() => setSpeed((s) => Math.max(0.1, s - 0.25))}>
-            - Speed
-          </button>
-          <button onClick={() => setSpeed((s) => Math.min(4, s + 0.25))}>
-            + Speed
-          </button>
-          <div className="speed-display">Speed: {speed.toFixed(2)}</div>
+
+          <div className="speed-control">
+            <label>🎚️ Speed Control</label>
+            <input
+              type="range"
+              min="0.1"
+              max="4"
+              step="0.1"
+              value={speed}
+              onChange={(e) => setSpeed(parseFloat(e.target.value))}
+            />
+            <div className="speed-display">
+              ⚡ <strong>{speed.toFixed(2)}x</strong>
+            </div>
+          </div>
         </div>
 
+        {/* Kid storytelling */}
+        {mode === "kid" && (
+          <div className="kid-story">
+            <p>🚀 Explore planets and earn badges!</p>
+            <div className="badges">
+              <span className="badge">🌍 Explorer</span>
+              <span className="badge">🔭 Discoverer</span>
+              <span className="badge">👩‍🔬 Scientist</span>
+            </div>
+          </div>
+        )}
+
+        {/* Planet Info Panel */}
         <div className="info-panel">
           {planets.length === 0 && (
-            <div className="no-select">Load a planet to inspect it</div>
+            <div className="no-select">
+              {mode === "kid"
+                ? "🌌 Load a planet and hear its story!"
+                : "Load a planet to inspect it"}
+            </div>
           )}
-          {planets.length === 1 && <PlanetInfoPanel selected={planets[0]} />}
+          {planets.length === 1 && (
+            <PlanetInfoPanel selected={planets[0]} mode={mode} />
+          )}
           {planets.length === 2 && (
             <div className="comparison">
-              <PlanetInfoPanel selected={planets[0]} />
-              <PlanetInfoPanel selected={planets[1]} />
+              <PlanetInfoPanel selected={planets[0]} mode={mode} />
+              <PlanetInfoPanel selected={planets[1]} mode={mode} />
             </div>
           )}
         </div>
 
-        {mode === "scientist" && <ScientistOverview planets={planets} />}
+        {/* Scientist Overview */}
+        {mode === "scientist" && (
+          <div className="scientist-graphs">
+            <ScientistOverview planets={planets} />
+          </div>
+        )}
 
+        {/* Candidate Lists */}
         <div className="candidates-section">
           <CandidatesList
             listTitle="Kepler Candidates"
@@ -124,6 +165,7 @@ export default function Dashboard({ initialPlanets = [] }) {
             loadedPlanets={planets}
             onLoadCandidate={handleLoadCandidate}
             onUnloadCandidate={handleUnloadCandidate}
+            mode={mode}
           />
           <CandidatesList
             listTitle="TESS Candidates"
@@ -131,6 +173,7 @@ export default function Dashboard({ initialPlanets = [] }) {
             loadedPlanets={planets}
             onLoadCandidate={handleLoadCandidate}
             onUnloadCandidate={handleUnloadCandidate}
+            mode={mode}
           />
         </div>
       </aside>

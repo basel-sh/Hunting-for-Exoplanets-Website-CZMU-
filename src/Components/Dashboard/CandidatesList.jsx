@@ -64,7 +64,7 @@ export default function CandidatesList({
         }}
       >
         {rows.length === 0 && !loading && (
-          <div style={{ padding: 8 }}>No results</div>
+          <div style={{ padding: 8 }}>refresh to try again</div>
         )}
         {rows.map((r, i) => {
           const id = r.kepoi_name || r.pl_name || r.kepid || `row-${i}`;

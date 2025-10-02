@@ -3,11 +3,13 @@ import Footer from "./Components/Footer";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import Navbar from "./Components/Header";
 import Home from "./Home";
-import Storytelling from "./Components/Storytelling";
+import AboutUs from "./Components/About_us";
 import PlanetGame from "./Components/PlanetGame";
+import BackgroundParticles from "./Components/BackgroundParticles"; // ✅ الخلفية
+import StoryPage from "./StoryPage"; // ✅ إضافة جديدة: استيراد صفحة القصة
 
 export default function App() {
-  const location = useLocation(); // ✅ get current route
+  const location = useLocation();
 
   const spaceObjects = [
     {
@@ -46,20 +48,17 @@ export default function App() {
 
   return (
     <>
-      <style>{`
-        .main-content {
-          flex: 1;
-          padding-top: 60px; /* navbar height */
-        }
-      `}</style>
-
+      <BackgroundParticles />{" "}
+      {/* ⭐ النجوم في الخلفية – ستظهر في /story أيضًا */}
       <div className="mainappdiv">
         <Navbar />
-        <div className="main-content">
+        <div className="main-content" style={{ flex: 1, paddingTop: "60px" }}>
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/" element={<Home />} />
-            <Route path="/storytelling" element={<Storytelling />} />
+            <Route path="/AboutUs" element={<AboutUs />} />
+            <Route path="/story" element={<StoryPage />} />{" "}
+            {/* ✅ إضافة جديدة: Route لصفحة القصة */}
             <Route
               path="/game"
               element={<PlanetGame objects={spaceObjects} />}
@@ -67,8 +66,9 @@ export default function App() {
           </Routes>
         </div>
 
-        {/* ✅ Only show footer if not on dashboard */}
-        {location.pathname !== "/dashboard" && <Footer />}
+        {/* ✅ تعديل: إخفاء Footer في /story أيضًا (اختياري – لصفحة فيديو كاملة) */}
+        {location.pathname !== "/dashboard" &&
+          location.pathname !== "/story" && <Footer />}
       </div>
     </>
   );

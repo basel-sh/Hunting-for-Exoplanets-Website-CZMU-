@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./PlanetGame.css";
 
-export default function PlanetGame({ objects }) {
+export default function PlanetGame({ objects = [] }) {
   // حالات اللعبة: 'story', 'playing', 'end'
   const [gameState, setGameState] = useState("story");
   const [score, setScore] = useState(0);
@@ -10,27 +10,17 @@ export default function PlanetGame({ objects }) {
   const [showAlien, setShowAlien] = useState(false);
   const [dialogueQueue, setDialogueQueue] = useState([]);
   const [dialogue, setDialogue] = useState("");
-  const [isWaiting, setIsWaiting] = useState(false); // لتعطيل الأزرار أثناء الانتظار
+  const [isWaiting, setIsWaiting] = useState(false);
 
   const audioRef = useRef(null);
 
-  // الحوارات منظمة في صفوف (queues) لتسلسل العرض
   const dialogues = {
     start: [
-      {
-        text: "👩‍🚀 Let’s start exploring the universe!",
-        audio: "/audio/start1.mp3",
-      },
-      {
-        text: "👽 I’ll test you with some mysterious objects!",
-        audio: "/audio/start2.mp3",
-      },
+      { text: "👩‍🚀 Let’s start exploring the universe!", audio: "/audio/start1.mp3" },
+      { text: "👽 I’ll test you with some mysterious objects!", audio: "/audio/start2.mp3" },
     ],
     correct: [
-      {
-        text: "👽 Confirmed! This is a real planet 🚀",
-        audio: "/audio/correct1.mp3",
-      },
+      { text: "👽 Confirmed! This is a real planet 🚀", audio: "/audio/correct1.mp3" },
       { text: "👩‍🚀 Great job, co-pilot!", audio: "/audio/correct2.mp3" },
     ],
     wrong: [
@@ -38,18 +28,11 @@ export default function PlanetGame({ objects }) {
       { text: "👩‍🚀 Don’t worry, we’ll try again!", audio: "/audio/wrong2.mp3" },
     ],
     end: [
-      {
-        text: "👩‍🚀 We explored the galaxy together. Thanks, astronaut!",
-        audio: "/audio/end1.mp3",
-      },
-      {
-        text: "👽 That was fun! Until next mission 👋",
-        audio: "/audio/end2.mp3",
-      },
+      { text: "👩‍🚀 We explored the galaxy together. Thanks, astronaut!", audio: "/audio/end1.mp3" },
+      { text: "👽 That was fun! Until next mission 👋", audio: "/audio/end2.mp3" },
     ],
   };
 
-  // تشغيل الصوت مع إدارة المرجع
   const playAudio = (src) => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -57,13 +40,12 @@ export default function PlanetGame({ objects }) {
     }
     if (src) {
       audioRef.current = new Audio(src);
-      audioRef.current.play();
+      audioRef.current.play().catch(() => {});
     }
   };
 
-  // عرض الحوار التالي في الصف
   const playNextDialogue = () => {
-    if (dialogueQueue.length === 0) {
+    if (!dialogueQueue || dialogueQueue.length === 0) {
       setDialogue("");
       return;
     }
@@ -73,30 +55,20 @@ export default function PlanetGame({ objects }) {
     setDialogueQueue(rest);
   };
 
-  // عند تغيير صف الحوارات، نبدأ تشغيل أول حوار
   useEffect(() => {
-    if (dialogueQueue.length > 0) {
-      playNextDialogue();
-    }
+    if (dialogueQueue && dialogueQueue.length > 0) playNextDialogue();
     // eslint-disable-next-line
   }, [dialogueQueue]);
 
-  // عند انتهاء الصوت، ننتقل للحوار التالي تلقائياً
   useEffect(() => {
     if (!audioRef.current) return;
-
-    const handleEnded = () => {
-      playNextDialogue();
-    };
-
+    const handleEnded = () => playNextDialogue();
     audioRef.current.addEventListener("ended", handleEnded);
     return () => {
-      if (audioRef.current)
-        audioRef.current.removeEventListener("ended", handleEnded);
+      if (audioRef.current) audioRef.current.removeEventListener("ended", handleEnded);
     };
   }, [dialogueQueue]);
 
-  // بدء اللعبة بعد انتهاء القصة أو تخطيها
   const startGame = () => {
     setGameState("playing");
     setScore(0);
@@ -105,14 +77,13 @@ export default function PlanetGame({ objects }) {
     setDialogueQueue([...dialogues.start]);
   };
 
-  // تحديث الكائن الحالي عند تغير currentIndex أو objects
   useEffect(() => {
-    if (gameState === "playing" && objects && currentIndex < objects.length) {
+    if (!objects) return;
+    if (gameState === "playing" && currentIndex < objects.length) {
       setCurrentObject(objects[currentIndex]);
       setShowAlien(false);
       setIsWaiting(false);
     } else if (gameState === "playing" && currentIndex >= objects.length) {
-      // نهاية اللعبة
       setGameState("end");
       setDialogueQueue([...dialogues.end]);
       setShowAlien(true);
@@ -120,23 +91,12 @@ export default function PlanetGame({ objects }) {
     // eslint-disable-next-line
   }, [currentIndex, objects, gameState]);
 
-  // التعامل مع إجابة اللاعب
   const handleAnswer = (choice) => {
     if (isWaiting || !currentObject) return;
-
     setIsWaiting(true);
     const isCorrect = choice === currentObject.isPlanet;
-
-    if (isCorrect) {
-      setScore((prev) => prev + 1);
-      setDialogueQueue([...dialogues.correct]);
-    } else {
-      setDialogueQueue([...dialogues.wrong]);
-    }
-
+    setDialogueQueue(isCorrect ? [...dialogues.correct] : [...dialogues.wrong]);
     setShowAlien(true);
-
-    // بعد انتهاء الحوارات (نقدر نستخدم setTimeout تقريبي)
     setTimeout(() => {
       setCurrentIndex((prev) => prev + 1);
       setShowAlien(false);
@@ -144,9 +104,7 @@ export default function PlanetGame({ objects }) {
     }, 2500);
   };
 
-  // اختيار صورة الشخصية حسب الحالة
-  const getCharacterImage = () =>
-    showAlien ? "/character/alien.png" : "/character/astronaut.png";
+  const getCharacterImage = () => showAlien ? "/character/alien.png" : "/character/astronaut.png";
 
   // --- JSX ---
 
@@ -178,18 +136,10 @@ export default function PlanetGame({ objects }) {
     return (
       <div className="planet-game" role="main" aria-live="polite">
         <h2>Game Over!</h2>
-        <p>
-          Your Score: {score} / {objects.length}
-        </p>
+        <p>Your Score: {score} / {(objects?.length) || 0}</p>
         <div className="character-container">
-          <img
-            src="/character/alien.png"
-            alt="Alien"
-            className="character-img"
-          />
-          <div className="speech-bubble">
-            {dialogue || "Thanks for playing!"}
-          </div>
+          <img src="/character/alien.png" alt="Alien" className="character-img" />
+          <div className="speech-bubble">{dialogue || "Thanks for playing!"}</div>
         </div>
         <button onClick={() => setGameState("story")} aria-label="Play again">
           Play Again
@@ -218,20 +168,16 @@ export default function PlanetGame({ objects }) {
       {currentObject ? (
         <>
           <img
-            src={currentObject.image}
-            alt={currentObject.name}
+            src={currentObject.image || ""}
+            alt={currentObject.name || "Unknown object"}
             className="planet-img"
             loading="lazy"
           />
-          <h3>{currentObject.name}</h3>
-          <p>Radius: {currentObject.radius}</p>
-          <p>Distance: {currentObject.distance}</p>
+          <h3>{currentObject.name || "Unknown"}</h3>
+          <p>Radius: {currentObject.radius || "Unknown"}</p>
+          <p>Distance: {currentObject.distance || "Unknown"}</p>
 
-          <div
-            className="game-buttons"
-            role="group"
-            aria-label="Answer options"
-          >
+          <div className="game-buttons" role="group" aria-label="Answer options">
             <button
               onClick={() => handleAnswer(true)}
               disabled={isWaiting}
@@ -250,11 +196,7 @@ export default function PlanetGame({ objects }) {
             </button>
           </div>
 
-          <p
-            aria-live="polite"
-            aria-atomic="true"
-            style={{ marginTop: "15px" }}
-          >
+          <p aria-live="polite" aria-atomic="true" style={{ marginTop: "15px" }}>
             Score: {score}
           </p>
         </>
@@ -264,3 +206,4 @@ export default function PlanetGame({ objects }) {
     </div>
   );
 }
+

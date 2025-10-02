@@ -1,8 +1,11 @@
 .project-cards {
   text-align: center;
   padding: 50px 20px;
-  background-color: #0d1117;
+  background-color: rgba(13, 17, 23, 0.8); 
   color: #fff;
+  position: relative; 
+  z-index: 1; 
+  backdrop-filter: blur(5px); 
 }
 
 .project-cards h2 {
@@ -15,11 +18,10 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
-
 }
 
 .card {
-  background-color: #161b22;
+  background-color: rgba(22, 27, 34, 0.85); 
   border-radius: 15px;
   padding: 20px;
   width: 250px;
@@ -40,9 +42,10 @@
   font-size: 0.95rem;
   line-height: 1.4;
 }
+
 .see-more-container {
   text-align: center;
   margin-top: 20px;
   position: relative;
-  z-index: 100; /* أعلى من الفوتر */
+  z-index: 2; 
 }

@@ -1,18 +1,25 @@
 import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import * as THREE from "three";
 import "./Components/ProjectCards.css";
-import "./style.css"; // CSS لترتيب الصفحة والفوتر
-import "./Components/PlanetGame.css"; // CSS للعبة
+import "./style.css";
+import "./Components/PlanetGame.css";
 import HabitablePlanets from "./Components/HabitablePlanets";
-import PlanetGame from "./Components/PlanetGame"; // اللعبة
+import "./StoryPage.css"
+
 
 export default function Home() {
+  const navigate = useNavigate();
   const mountRef = useRef(null);
+  const sceneRef = useRef(null);
+  const raycasterRef = useRef(new THREE.Raycaster());
+  const mouseRef = useRef(new THREE.Vector2());
 
   useEffect(() => {
     if (!mountRef.current) return;
 
     const scene = new THREE.Scene();
+    sceneRef.current = scene;
     scene.background = new THREE.Color(0x0d1117);
 
     const camera = new THREE.PerspectiveCamera(
@@ -30,65 +37,142 @@ export default function Home() {
     );
     mountRef.current.appendChild(renderer.domElement);
 
-    const geometry = new THREE.SphereGeometry(2, 64, 64);
-    const texture = new THREE.TextureLoader().load("/2k_earth_daymap.jpg");
-    const material = new THREE.MeshStandardMaterial({ map: texture });
-    const planet = new THREE.Mesh(geometry, material);
-    scene.add(planet);
+    // 🌍 كوكب الأرض
+    const earthGeometry = new THREE.SphereGeometry(2, 64, 64);
+    const earthTexture = new THREE.TextureLoader().load("/2k_earth_daymap.jpg");
+    const earthMaterial = new THREE.MeshStandardMaterial({ map: earthTexture });
+    const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+    scene.add(earth);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // 🚩 علم مصر (عند إحداثيات مصر على الكرة الأرضية)
+    const flagGeometry = new THREE.PlaneGeometry(0.5, 0.3); // حجم العلم
+    const flagTexture = new THREE.TextureLoader().load("/Flag_of_Egypt.png");
+    const flagMaterial = new THREE.MeshBasicMaterial({
+      map: flagTexture,
+      side: THREE.DoubleSide,
+      transparent: true,
+    });
+
+    const egyptFlag = new THREE.Mesh(flagGeometry, flagMaterial);
+
+    // 📍 إحداثيات مصر (القاهرة) lat/lon -> 3D
+    const radius = 2.02; // نصف قطر الأرض + هامش صغير علشان العلم يكون فوق السطح
+    const lat = 26 * (Math.PI / 180); // خط العرض
+    const lon = 30 * (Math.PI / 180); // خط الطول
+
+    const x = radius * Math.cos(lat) * Math.cos(lon);
+    const y = radius * Math.sin(lat);
+    const z = radius * Math.cos(lat) * Math.sin(lon);
+
+    egyptFlag.position.set(x, y, z);
+
+    // خلي العلم يواجه برّه (من مركز الأرض للخارج)
+    egyptFlag.lookAt(egyptFlag.position.clone().multiplyScalar(2));
+
+    // أضف العلم كـ child للأرض عشان يلف معاها
+    earth.add(egyptFlag);
+
+    console.log("العلم أضيف فوق مصر:", egyptFlag.position);
+
+    // 🌌 نجوم خلفية
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 2000;
+    const positions = new Float32Array(starCount * 3);
+
+    for (let i = 0; i < starCount * 3; i += 3) {
+      positions[i] = (Math.random() - 0.5) * 2000;
+      positions[i + 1] = (Math.random() - 0.5) * 2000;
+      positions[i + 2] = (Math.random() - 0.5) * 2000;
+    }
+
+    starGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(positions, 3)
+    );
+    const starMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 3,
+      sizeAttenuation: false,
+    });
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    // 💡 إضاءة
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
-
-    const pointLight = new THREE.PointLight(0xffffff, 1.2);
+    const pointLight = new THREE.PointLight(0xffffff, 2);
     pointLight.position.set(10, 10, 10);
     scene.add(pointLight);
 
+    let starRotation = 0;
+
     const animate = () => {
       requestAnimationFrame(animate);
-      planet.rotation.y += 0.003;
+
+      // دوران الأرض (العلم هيلف معاها لأنه child)
+      earth.rotation.y += 0.003;
+
+      // دوران النجوم
+      starRotation += 0.0002;
+      stars.rotation.y = starRotation;
+      stars.rotation.x = starRotation * 0.5;
+
       renderer.render(scene, camera);
     };
     animate();
 
+    // 🎯 النقر على العلم
+    const handleClick = (event) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycasterRef.current.setFromCamera(mouseRef.current, camera);
+      const intersects = raycasterRef.current.intersectObjects(
+        scene.children,
+        true
+      );
+
+      for (let intersect of intersects) {
+        if (intersect.object === egyptFlag) {
+          navigate("/story");
+          console.log("تم النقر على علم مصر!");
+          return;
+        }
+      }
+      console.log("نقر خارج العلم – intersects:", intersects.length);
+    };
+
+    renderer.domElement.addEventListener("click", handleClick);
+
+    // 🧹 تنظيف
     return () => {
-      if (mountRef.current && renderer.domElement) {
+      if (
+        mountRef.current &&
+        renderer.domElement &&
+        renderer.domElement.parentNode === mountRef.current
+      ) {
         mountRef.current.removeChild(renderer.domElement);
       }
+      if (renderer.domElement) {
+        renderer.domElement.removeEventListener("click", handleClick);
+      }
+      if (renderer) renderer.dispose();
+      if (earthMaterial) earthMaterial.dispose();
+      if (earthGeometry) earthGeometry.dispose();
+      if (flagMaterial) flagMaterial.dispose();
+      if (flagGeometry) flagGeometry.dispose();
+      if (starMaterial) starMaterial.dispose();
+      if (starGeometry) starGeometry.dispose();
+      if (earthTexture) earthTexture.dispose();
+      if (flagTexture) flagTexture.dispose();
+      console.log("تم تنظيف Three.js بنجاح!");
     };
-  }, []);
-
-  // بيانات مبدئية للعبة (يمكن استبدالها لاحقًا بالـ backend)
-  const gamePlanets = [
-    {
-      name: "Kepler-22b",
-      habitable: true,
-      radius: "2.4 Earth radii",
-      distance: "600 ly",
-    },
-    {
-      name: "Proxima Centauri b",
-      habitable: true,
-      radius: "1.3 Earth radii",
-      distance: "4.2 ly",
-    },
-    {
-      name: "TRAPPIST-1d",
-      habitable: false,
-      radius: "0.77 Earth radii",
-      distance: "40 ly",
-    },
-    {
-      name: "Kepler-442b",
-      habitable: true,
-      radius: "1.34 Earth radii",
-      distance: "1200 ly",
-    },
-  ];
+  }, [navigate]);
 
   return (
-    <div className="home-container">
-      {/* البانر */}
-      <section className="main">
+    <div className="home-container" style={{ position: "relative", zIndex: 10 }}>
+      <section className="main" style={{ position: "relative", zIndex: 20 }}>
         <div>
           <h2>
             Welcome to <span>CZMU</span>
@@ -97,44 +181,54 @@ export default function Home() {
         </div>
       </section>
 
-      {/* الكوكب */}
-      <section className="planet-section">
+      <section
+        className="planet-section"
+        style={{ position: "relative", zIndex: 15 }}
+      >
         <div
           className="planet-container"
           ref={mountRef}
-          style={{ width: "100%", height: "400px" }}
+          style={{
+            width: "100%",
+            height: "500px",
+            position: "relative",
+            zIndex: 5,
+          }}
         />
-        <div className="planet-info">
+        <div
+          className="planet-info"
+          style={{ position: "relative", zIndex: 25 }}
+        >
           <h2>Interactive Exoplanet Visualization</h2>
           <p>
-            Rotate and explore planets. Discover their data, habitability
-            potential, and learn how AI helps in finding new worlds beyond our
-            solar system.
+            Rotate and explore Earth. Click on the Egyptian flag to discover a
+            story! Learn how AI helps in finding new worlds beyond our solar
+            system.
           </p>
         </div>
       </section>
 
-      {/* كروت المشروع */}
-      <section className="project-cards">
+      <section
+        className="project-cards"
+        style={{ position: "relative", zIndex: 30 }}
+      >
         <h2>Our Solution</h2>
         <div className="cards-container">
-          <div className="card">
+          <div className="card" style={{ position: "relative", zIndex: 35 }}>
             <h3>Problem</h3>
             <p>
-              Thousands of exoplanets data exist, but most are analyzed
-              manually, which is slow and tedious.
+              Thousands of exoplanets data exist, but most are analyzed manually,
+              which is slow and tedious.
             </p>
           </div>
-
-          <div className="card">
+          <div className="card" style={{ position: "relative", zIndex: 35 }}>
             <h3>Our Approach</h3>
             <p>
               Using AI and Machine Learning to automatically analyze exoplanet
               datasets from NASA.
             </p>
           </div>
-
-          <div className="card">
+          <div className="card" style={{ position: "relative", zIndex: 35 }}>
             <h3>Impact</h3>
             <p>
               Faster and more accurate identification of new exoplanets, helping
@@ -144,11 +238,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* قائمة الكواكب التفاعلية */}
       <HabitablePlanets />
 
-      {/* لعبة اكتشاف الكواكب */}
-      <section className="game-section">
+      <section className="game-section" style={{ position: "relative", zIndex: 20 }}>
         <h2>Test Your Skills!</h2>
       </section>
     </div>

@@ -11,9 +11,10 @@ export default function Footer() {
         <div className="footer-section">
           <h4 className="footer-title">About Us</h4>
           <p className="footer-text">
-            CZMU is a platform that visualizes exoplanets in 3D and uses AI with
-            NASA’s datasets to estimate the potential habitability of other
-            worlds. Explore, learn, and imagine new horizons.
+            Discover the wonders of distant worlds with CZMU! Visualize
+            exoplanets in 3D, explore NASA datasets, and see how AI predicts
+            their habitability. Learn, explore, and ignite your curiosity about
+            the universe.
           </p>
         </div>
 
@@ -32,8 +33,13 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <Link className="footer-link" to="/game">
+                Planet Game 🎮
+              </Link>
+            </li>
+            <li>
               <Link className="footer-link" to="/storytelling">
-                Storytelling
+                About us
               </Link>
             </li>
           </ul>

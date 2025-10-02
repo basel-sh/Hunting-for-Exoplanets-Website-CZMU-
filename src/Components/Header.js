@@ -19,22 +19,12 @@ const Navbar = () => {
         </li>
         <li>
           <NavLink
-            to="/dashboard"
+            to="/AboutUs"
             className={({ isActive }) =>
               isActive ? "navLink active" : "navLink"
             }
           >
-            Dashboard
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/storytelling"
-            className={({ isActive }) =>
-              isActive ? "navLink active" : "navLink"
-            }
-          >
-            Storytelling
+            AboutUs
           </NavLink>
         </li>
         <li>
@@ -45,6 +35,16 @@ const Navbar = () => {
             }
           >
             Planet Game
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              isActive ? "navLink active" : "navLink"
+            }
+          >
+            Dashboard
           </NavLink>
         </li>
       </ul>
