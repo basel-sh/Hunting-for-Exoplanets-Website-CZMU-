@@ -17,6 +17,7 @@ export default function Home() {
   const raycasterRef = useRef(new THREE.Raycaster());
   const mouseRef = useRef(new THREE.Vector2());
   const [modalContent, setModalContent] = useState(null);
+  const [showScript, setShowScript] = React.useState(false);
   const egyptRef = useRef(null);
   const usaRef = useRef(null);
   const franceRef = useRef(null);
@@ -211,7 +212,6 @@ export default function Home() {
   return (
     <div className="home-container">
       <BackgroundParticles />
-
       {/* Hero Section */}
       <section className="hero-section centered-section">
         <h1 className="hero-title">
@@ -229,7 +229,6 @@ export default function Home() {
           Explore
         </button>
       </section>
-
       {/* Interactive Earth Section */}
       <section className="earth-section centered-section">
         <h2 className="section-title">🌍 Interactive Earth</h2>
@@ -275,41 +274,70 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Modal */}
       {/* Modal */}
       {modalContent && (
         <div
-          className="modal"
+          className="modal-overlay"
           style={{
             position: "fixed",
             top: 0,
             left: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(0,0,0,0.6)",
+            backgroundColor: "rgba(0,0,0,0.7)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 20,
+            zIndex: 100,
+            animation: "fadeIn 0.4s ease-in-out",
           }}
         >
           {(() => {
             const content = {
               Egypt: {
+                flag: "/flags/Flag_of_Egypt.png",
                 img: "/images/egypt-bg.jpg",
                 audio: "/audio/egypt-story.mp3",
                 desc: "Egypt, land of the Pharaohs, where ancient astronomy guided the pyramids and temples.",
+                script: `اهلا 
+أنا مصر…
+مهد الحضارة. لأكثر من خمسة آلاف عام، شعبي رفع عينيه للسماء بإعجاب وانبهار.
+الأهرامات التي أحملها على رمالي ليست مجرد آثار — بل خرائط كونية. وُجِّهت مع نجوم الجبار لتدل الأرواح على طريق الخلود.
+في أبو سمبل، تنحني الشمس نفسها بدقة، لتضيء وجه رمسيس في يوم ميلاده ويوم تتويجه. أسلافي لم يكونوا مجرد معماريين — بل فلكيين، رياضيين، وحالمين بالنجوم.
+
+لكنني لست مجرد ماضٍ منقوش على الحجر.
+اليوم أنهض من جديد بالعلم والابتكار. جامعاتي، شبابي، ومهندسيّ — يبنون تلسكوبات، يطلقون أقمارًا صناعية، ويدرّبون الآلات لتقرأ اللغة الخفية للكون.
+
+الذكاء الاصطناعي أصبح كاتبي الجديد، يخط قصص الكواكب خلف الشمس.
+الفضول نفسه الذي حرّك الفراعنة يجري اليوم في عقول علمائي.
+
+أنا مصر — أزلية، لا تنكسر،
+أرض الحكمة القديمة والمستقبل بين النجوم."`,
               },
               USA: {
+                flag: "/flags/Flag_of_the_United_States.svg.png",
                 img: "/images/usa.jpg",
                 audio: "/audio/usa.mp3",
                 desc: "The USA, home of NASA and the Apollo missions, pioneered humanity’s journey to the Moon.",
+                script: "Here you can later add the USA script...",
               },
               France: {
-                img: "/images/france.jpg",
-                audio: "/audio/france.mp3",
+                flag: "/flags/Flag_of_France.svg.png",
+                img: "/images/france.avif",
+                audio: "/audio/french.mp3",
                 desc: "France has a rich space history through CNES, contributing to satellites and deep-space exploration.",
+                script: `Je suis la France…
+Une nation où la science et la poésie avancent main dans la main. Depuis des siècles, mes penseurs et mes rêveurs ont tracé les cieux.
+Cassini a cartographié les étoiles, Messier a catalogué les galaxies, et Laplace a révélé les lois cachées du cosmos. Jules Verne a imaginé des voyages vers la Lune bien avant que les fusées ne touchent le ciel.
+
+Mais je ne suis pas seulement un passé écrit dans les livres.
+Aujourd’hui, je lance des fusées Ariane, je conçois des télescopes, et j’inspire des enfants qui rêvent avec à la fois l’imagination et le code. Mes universités et mes observatoires rejoignent le monde entier dans la quête de nouveaux mondes, dissimulés dans les courbes lumineuses de la NASA.
+
+L’Intelligence Artificielle est ma nouvelle boussole, me guidant à travers les signaux, dévoilant des planètes et portant toujours plus loin ma curiosité.
+Le même esprit qui dessinait jadis les nébuleuses programme désormais des machines pour révéler les galaxies au-delà.
+
+Je suis la France, poétique, inventive,
+terre de rêveurs et d’explorateurs, s’élevant toujours plus haut vers les étoiles.`,
               },
             };
 
@@ -320,61 +348,146 @@ export default function Home() {
                 className="modal-content"
                 style={{
                   position: "relative",
-                  borderRadius: "12px",
+                  borderRadius: "20px",
                   padding: "30px",
-                  width: "80%",
+                  width: "85%",
+                  maxWidth: "900px",
                   height: "80%",
-                  maxWidth: "90%",
-                  textAlign: "center",
-                  boxShadow: "0 8px 30px rgba(0,0,0,0.6)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  // ✅ Background image
                   backgroundImage: `url(${c.img})`,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   color: "#fff",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.6)",
+                  animation: "scaleIn 0.4s ease-in-out",
                   overflow: "hidden",
                 }}
               >
-                {/* Dark overlay inside modal for readability */}
-                <div
+                {/* Floating Close Button */}
+                <button
+                  onClick={() => setModalContent(null)}
                   style={{
                     position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
+                    top: "15px",
+                    right: "15px",
                     background: "rgba(0,0,0,0.6)",
-                    zIndex: 0,
+                    border: "none",
+                    borderRadius: "50%",
+                    width: "40px",
+                    height: "40px",
+                    fontSize: "20px",
+                    fontWeight: "bold",
+                    color: "#fff",
+                    cursor: "pointer",
+                    transition: "background 0.3s",
                   }}
-                ></div>
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background = "rgba(255,0,0,0.8)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background = "rgba(0,0,0,0.6)")
+                  }
+                >
+                  ✕
+                </button>
 
-                {/* Modal Content */}
-                <div style={{ position: "relative", zIndex: 1 }}>
-                  <h2 style={{ marginBottom: "15px" }}>{modalContent}</h2>
-                  <p style={{ marginBottom: "15px" }}>{c.desc}</p>
-                  <audio
-                    controls
-                    style={{ width: "100%", marginBottom: "15px" }}
-                  >
-                    <source src={c.audio} type="audio/mpeg" />
-                    Your browser does not support the audio element.
-                  </audio>
-
-                  <button
-                    className="close-btn"
-                    onClick={() => setModalContent(null)}
+                {/* Header */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "15px",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <img
+                    src={c.flag}
+                    alt={modalContent}
                     style={{
-                      marginTop: "15px",
-                      padding: "10px 20px",
-                      border: "none",
+                      width: "60px",
+                      height: "40px",
+                      objectFit: "cover",
                       borderRadius: "6px",
-                      background: "#ffcc00",
-                      fontWeight: "bold",
-                      cursor: "pointer",
+                      border: "2px solid #fff",
+                    }}
+                  />
+                  <h2 style={{ fontSize: "2rem", fontWeight: "bold" }}>
+                    {modalContent}
+                  </h2>
+                </div>
+
+                {/* Description */}
+                <p style={{ marginBottom: "15px", fontSize: "1.1rem" }}>
+                  {c.desc}
+                </p>
+
+                {/* Audio */}
+                <audio
+                  controls
+                  style={{
+                    width: "100%",
+                    marginBottom: "15px",
+                    borderRadius: "6px",
+                    background: "#222",
+                  }}
+                >
+                  <source src={c.audio} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+
+                {/* Show Script Button */}
+                <button
+                  onClick={() => setShowScript(!showScript)}
+                  style={{
+                    marginBottom: "15px",
+                    padding: "10px 20px",
+                    border: "none",
+                    borderRadius: "8px",
+                    background: showScript
+                      ? "linear-gradient(135deg, #ff416c, #ff4b2b)"
+                      : "linear-gradient(135deg, #00c6ff, #0072ff)",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    transition: "transform 0.3s, box-shadow 0.3s",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = "translateY(-3px)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "translateY(0)")
+                  }
+                >
+                  {showScript ? "Hide Script" : "Show Script"}
+                </button>
+
+                {/* Script Panel */}
+                {showScript && (
+                  <div
+                    style={{
+                      background: "rgba(0,0,0,0.6)",
+                      padding: "15px",
+                      borderRadius: "10px",
+                      flexGrow: 1,
+                      overflowY: "auto",
+                      textAlign: "right",
+                      direction: "rtl",
                     }}
                   >
-                    Close
-                  </button>
-                </div>
+                    <p
+                      style={{
+                        whiteSpace: "pre-line",
+                        lineHeight: "1.8",
+                        fontSize: "1rem",
+                      }}
+                    >
+                      {c.script}
+                    </p>
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -413,7 +526,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* Habitable Planets Section */}
       <section
         className="planets-section centered-section"
@@ -442,7 +554,6 @@ export default function Home() {
           Your browser does not support the video tag.
         </video>
       </section>
-
       {/* Games & Quiz Section */}
       <section className="game-section centered-section">
         <h2 className="section-title">🎮 Test Your Skills!</h2>

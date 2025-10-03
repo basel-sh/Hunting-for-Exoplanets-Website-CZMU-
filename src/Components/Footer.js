@@ -28,8 +28,8 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link className="footer-link" to="/dashboard">
-                Dashboard
+              <Link className="footer-link" to="/storytelling">
+                About us
               </Link>
             </li>
             <li>
@@ -38,8 +38,13 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link className="footer-link" to="/storytelling">
-                About us
+              <Link className="footer-link" to="/ourmodel">
+                Model Statistics
+              </Link>
+            </li>
+            <li>
+              <Link className="footer-link" to="/dashboard">
+                Dashboard
               </Link>
             </li>
           </ul>
@@ -49,11 +54,12 @@ export default function Footer() {
         <div className="footer-section">
           <h4 className="footer-title">Follow Us</h4>
           <div className="footer-socials">
-            <a href="https://github.com" target="_blank" rel="noreferrer">
+            <a
+              href="https://github.com/basel-sh/Hunting-for-Exoplanets-Website-CZMU-"
+              target="_blank"
+              rel="noreferrer"
+            >
               <FaGithub />
-            </a>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer">
-              <FaTwitter />
             </a>
             <a href="https://youtube.com" target="_blank" rel="noreferrer">
               <FaYoutube />

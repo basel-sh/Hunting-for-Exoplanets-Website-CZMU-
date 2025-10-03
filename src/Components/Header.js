@@ -44,7 +44,7 @@ const Navbar = () => {
               isActive ? "navLink active" : "navLink"
             }
           >
-            Our Model
+            Model Statistics
           </NavLink>
         </li>
         <li>
