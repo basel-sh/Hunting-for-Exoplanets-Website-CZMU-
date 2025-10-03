@@ -77,7 +77,7 @@ export default function Dashboard({ initialPlanets = [] }) {
         <div className="czmu-header">
           <h2 className="czmu-title">
             {mode === "kid"
-              ? "🌈 CZMU Space Playground"
+              ? "🤩 CZMU Space Playground"
               : "🔬 CZMU Research Lab"}
           </h2>
           <div className="mode-switch">
@@ -102,8 +102,9 @@ export default function Dashboard({ initialPlanets = [] }) {
             {paused ? "▶️ Resume" : "⏸️ Pause"}
           </button>
 
+          {/* Improved Speed Control */}
           <div className="speed-control">
-            <label>🎚️ Speed Control</label>
+            <label>🎚️ Simulation Speed</label>
             <input
               type="range"
               min="0.1"
@@ -139,13 +140,17 @@ export default function Dashboard({ initialPlanets = [] }) {
                 : "Load a planet to inspect it"}
             </div>
           )}
-          {planets.length === 1 && (
-            <PlanetInfoPanel selected={planets[0]} mode={mode} />
-          )}
-          {planets.length === 2 && (
-            <div className="comparison">
-              <PlanetInfoPanel selected={planets[0]} mode={mode} />
-              <PlanetInfoPanel selected={planets[1]} mode={mode} />
+
+          {planets.length >= 1 && (
+            <div className={planets.length === 2 ? "comparison" : ""}>
+              {planets.map((planet) => (
+                <PlanetInfoPanel
+                  key={planet.kepoi_name}
+                  selected={planet}
+                  mode={mode}
+                  hideTitle={true} // <-- new prop to hide the title
+                />
+              ))}
             </div>
           )}
         </div>

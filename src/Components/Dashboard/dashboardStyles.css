@@ -226,3 +226,66 @@ html,
 .czmu-dashboard-root.scientist .czmu-title {
   color: #00d1ff;
 }
+/* Speed Control */
+.speed-control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.speed-control label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff8c42;
+  margin-bottom: 4px;
+}
+
+.speed-control input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #4caf50, #ffeb3b);
+  cursor: pointer;
+  outline: none;
+  transition: background 0.3s;
+}
+
+.speed-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff8c42;
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.speed-control input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Firefox */
+.speed-control input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff8c42;
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.speed-control input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.speed-display {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #fff;
+  text-align: right;
+  font-weight: 600;
+}

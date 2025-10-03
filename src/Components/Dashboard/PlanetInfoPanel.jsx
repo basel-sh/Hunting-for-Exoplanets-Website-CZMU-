@@ -3,7 +3,13 @@ import React from "react";
 import ScientistOverview from "./ScientistOverview";
 import KidsOverview from "./KidsOverview";
 
-export default function PlanetInfoPanel({ selected, mode = "scientist" }) {
+export default function PlanetInfoPanel({
+  selected,
+  mode = "scientist",
+  hideTitle = false,
+  totalPlanets = 1, // new prop to pass total loaded planets
+  maxPlanets = 2, // optional max limit
+}) {
   if (!selected) return null;
 
   const name =
@@ -19,19 +25,39 @@ export default function PlanetInfoPanel({ selected, mode = "scientist" }) {
   return (
     <div style={{ padding: 14, marginBottom: 12 }}>
       {/* header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 10,
-        }}
-      >
-        <h3 style={{ margin: 0 }}>{name}</h3>
-        <div style={{ fontSize: 12, color: "#ccc" }}>
-          {selected.hostname || ""}
+      {!hideTitle ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 10,
+          }}
+        >
+          <h3 style={{ margin: 0 }}>{name}</h3>
+          <div style={{ fontSize: 12, color: "#ccc" }}>
+            {selected.hostname || ""}
+          </div>
         </div>
-      </div>
+      ) : mode === "scientist" ? (
+        <div
+          style={{
+            marginBottom: 10,
+            padding: 8,
+            fontSize: 12,
+            color: "#888",
+            fontStyle: "italic",
+            borderLeft: "3px solid #aaa",
+          }}
+        >
+          {totalPlanets
+            ? `${totalPlanets} planet${
+                totalPlanets > 1 ? "s" : ""
+              } loaded (max ${maxPlanets}).`
+            : "Planet data loaded."}{" "}
+          In scientist mode, you can analyze detailed planetary properties.
+        </div>
+      ) : null}
 
       {/* Mode Overview */}
       {mode === "scientist" ? (

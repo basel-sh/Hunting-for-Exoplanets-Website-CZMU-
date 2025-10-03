@@ -54,7 +54,7 @@ const Confetti = ({ count = 20 }) =>
     </span>
   ));
 
-export default function KidsScientistOverview({ planet }) {
+export default function KidsOverview({ planet }) {
   const [hovered, setHovered] = useState(false);
   const [spin, setSpin] = useState(false);
   const [prediction, setPrediction] = useState(null);
