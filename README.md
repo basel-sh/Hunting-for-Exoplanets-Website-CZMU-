@@ -57,3 +57,19 @@ Follow these steps to run the website locally on your computer.
 ```bash
 git clone https://github.com/basel-sh/Hunting-for-Exoplanets-Website-CZMU-.git
 cd Hunting-for-Exoplanets-Website-CZMU-
+```
+
+### 2️⃣ Install Dependencies
+```bash
+npm install
+```
+
+### 3️⃣ Start the Development Server
+```bash
+npm run dev
+```
+
+### 4️⃣ Open in Browser
+```bash
+[npm install](http://localhost:5173)
+```
