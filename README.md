@@ -49,4 +49,32 @@ It makes space discovery accessible and exciting for **researchers, students, an
 ---
 
 ## 🧩 Project Structure
+frontend/
+│
+├── src/
+│ ├── Components/
+│ │ ├── Dashboard.jsx
+│ │ ├── PlanetGame.jsx
+│ │ ├── HabitablePlanets.jsx
+│ │ ├── ProjectCards.jsx
+│ │ └── Other UI components...
+│ ├── assets/
+│ ├── App.jsx
+│ └── main.jsx
+│
+├── package.json
+├── vite.config.js
+└── README.md
 
+
+
+---
+
+## 🧪 Run Locally
+
+Follow these steps to run the website locally on your computer.
+
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/basel-sh/Hunting-for-Exoplanets-Website-CZMU-.git
+cd Hunting-for-Exoplanets-Website-CZMU-
