@@ -46,27 +46,6 @@ It makes space discovery accessible and exciting for **researchers, students, an
 | **Deployment** | Vercel |
 | **AI API Source** | FastAPI (connected endpoint) |
 
----
-
-## 🧩 Project Structure
-frontend/
-│
-├── src/
-│ ├── Components/
-│ │ ├── Dashboard.jsx
-│ │ ├── PlanetGame.jsx
-│ │ ├── HabitablePlanets.jsx
-│ │ ├── ProjectCards.jsx
-│ │ └── Other UI components...
-│ ├── assets/
-│ ├── App.jsx
-│ └── main.jsx
-│
-├── package.json
-├── vite.config.js
-└── README.md
-
-
 
 ---
 
